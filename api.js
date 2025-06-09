@@ -1,5 +1,8 @@
-const BASE_API_URL = 'http://localhost:5000/api';
-const IMG_URL = 'http://localhost:5000/uploads/';
+// const BASE_API_URL = 'http://localhost:5000/api';
+// const IMG_URL = 'http://localhost:5000/uploads/';
+const BASE_API_URL='https://ewa-back.vercel.app/api'
+const IMG_URL = 'https://ewa-back.vercel.app/uploads/'
+
 
 const API = {
     endpoints: {
