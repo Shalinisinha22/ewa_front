@@ -1,9 +1,10 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import {Navbar} from "./components/Navbar"
-import {Footer} from "./components/Footer"
+
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import Navbar from './components/Navbar';
+import Footer from "./components/Footer"
 import './App.css'; 
 
 function App() {
