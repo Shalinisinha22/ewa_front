@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import Ratingstars from '../../components/ratingstars';
+import Ratingstars from '../../Components/ratingstars';
 import { addToCart } from '../../redux/cartSlice';
 
 const ProductCards = ({products}) => {

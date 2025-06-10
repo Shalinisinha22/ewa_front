@@ -14,7 +14,7 @@ import ReturnPolicy from "../pages/ReturnPolicy";
 import Contact from "../pages/Contact";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
-import {ProtectedRoute} from "../components/ProtectedRoute"
+import {ProtectedRoute} from "../Components/ProtectedRoute"
 
 import Profile from "../pages/profile/Profile";
 import Wishlist from "../pages/wishlist/Wishlist";
