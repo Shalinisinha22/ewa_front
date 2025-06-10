@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import products from '../../../data/products.json';
-import Ratingstars from '../../../Components/ratingstars';
+import Ratingstars from '../../../components/ratingstars';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../../redux/cartSlice';
 
