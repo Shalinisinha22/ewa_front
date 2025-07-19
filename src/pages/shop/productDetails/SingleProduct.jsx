@@ -11,10 +11,20 @@ const SingleProduct = () => {
     const {id} = useParams(); 
     const dispatch = useDispatch();
     const [showNotification, setShowNotification] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const cart = useSelector((state) => state.cart);
 
     const product = products.filter((product) => product.id == id);
 
+    // Sample product media (5 images + 1 video)
+    const productMedia = [
+        { type: 'image', src: product[0]?.image },
+        { type: 'image', src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop' },
+        { type: 'image', src: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop' },
+        { type: 'image', src: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop' },
+        { type: 'image', src: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop' },
+        { type: 'video', src: 'https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c0fd273d2c6d9a064f3ae35579b2bbdf&profile_id=139&oauth2_token_id=57447761' }
+    ];
     useEffect(() => {
         window.scrollTo(0,0)
     }, [id]);
@@ -38,6 +48,13 @@ const SingleProduct = () => {
         setTimeout(() => setShowNotification(false), 2000);
     };
 
+    const nextImage = () => {
+        setCurrentImageIndex((prev) => (prev + 1) % productMedia.length);
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) => (prev - 1 + productMedia.length) % productMedia.length);
+    };
     return (
         <>
      <section className="section__container bg-primary-light">
@@ -59,8 +76,72 @@ const SingleProduct = () => {
 
       <section className='section__container mt-8'>
         <div className='flex flex-col items-center md:flex-row gap-8'>
+          {/* Product Image Slider */}
           <div className='md:w-1/2 w-full'>
-            <img className='rounded-md w-full h-auto' src={product[0].image} alt={product[0].name}></img>
+            <div className='relative'>
+              {/* Main Image/Video Display */}
+              <div className='relative h-96 md:h-[500px] bg-gray-100 rounded-lg overflow-hidden'>
+                {productMedia[currentImageIndex].type === 'image' ? (
+                  <img 
+                    className='w-full h-full object-cover' 
+                    src={productMedia[currentImageIndex].src} 
+                    alt={`${product[0].name} view ${currentImageIndex + 1}`}
+                  />
+                ) : (
+                  <video 
+                    className='w-full h-full object-cover' 
+                    controls
+                    src={productMedia[currentImageIndex].src}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+                
+                {/* Navigation Arrows */}
+                <button 
+                  onClick={prevImage}
+                  className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 transition-all'
+                >
+                  <i className="ri-arrow-left-s-line text-xl"></i>
+                </button>
+                <button 
+                  onClick={nextImage}
+                  className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 transition-all'
+                >
+                  <i className="ri-arrow-right-s-line text-xl"></i>
+                </button>
+                
+                {/* Image Counter */}
+                <div className='absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm'>
+                  {currentImageIndex + 1} / {productMedia.length}
+                </div>
+              </div>
+              
+              {/* Thumbnail Navigation */}
+              <div className='flex gap-2 mt-4 overflow-x-auto pb-2'>
+                {productMedia.map((media, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                      currentImageIndex === index ? 'border-primary' : 'border-gray-200 hover:border-gray-400'
+                    }`}
+                  >
+                    {media.type === 'image' ? (
+                      <img 
+                        src={media.src} 
+                        alt={`Thumbnail ${index + 1}`}
+                        className='w-full h-full object-cover'
+                      />
+                    ) : (
+                      <div className='w-full h-full bg-gray-200 flex items-center justify-center'>
+                        <i className="ri-play-circle-line text-xl text-gray-600"></i>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
       
         <div className='md:w-1/2 w-full relative'>

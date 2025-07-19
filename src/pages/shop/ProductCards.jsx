@@ -46,9 +46,9 @@ const ProductCards = ({products}) => {
   };
 
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-10'>
+    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8'>
       {
-        products.slice(0,8).map((product)=>(
+        products.map((product)=>(
             <div key={product.id || product._id} className='product__card'>
                 <div className='relative'>
                     <Link to={`/shop/${product.id || product._id}`}>

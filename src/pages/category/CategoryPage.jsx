@@ -25,9 +25,9 @@ const CategoryPage = () => {
      </section>
 
      <div className='section__container'>
-        <ProductCards products={filteredProducts}>
-
-        </ProductCards>
+        <div className="mt-10">
+          <ProductCards products={filteredProducts} />
+        </div>
      </div>
     </>
   );

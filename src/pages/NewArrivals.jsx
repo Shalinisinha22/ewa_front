@@ -53,7 +53,9 @@ const NewArrivals = () => {
           <h3 className="text-xl font-medium mb-6">
             Latest Products ({newProducts.length} items)
           </h3>
-          <ProductCards products={newProducts} />
+          <div className="mt-6">
+            <ProductCards products={newProducts} />
+          </div>
         </div>
 
         {/* Categories for New Arrivals */}

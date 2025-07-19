@@ -16,8 +16,9 @@ const TrendingProducts = () => {
       </p>
 
       {/* products card */}
-      <ProductCards  products={products}>
-      </ProductCards>
+      <div className="mt-10">
+        <ProductCards products={products.slice(0, visibleProducts)} />
+      </div>
 
       {visibleProducts < products.length && (
         <div className="text-center mt-8">

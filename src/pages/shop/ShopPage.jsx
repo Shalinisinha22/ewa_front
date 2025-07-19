@@ -104,7 +104,9 @@ const ShopPage = () => {
             <h3 className="text-xl font-medium mb-4">
               Products Available {products.length}
             </h3>
-            <ProductCard products={products} />
+            <div className="mt-6">
+              <ProductCard products={products} />
+            </div>
           </div>
         </div>
       </section>
