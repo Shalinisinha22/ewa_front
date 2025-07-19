@@ -24,7 +24,7 @@ const TrendingProducts = () => {
         <div className="text-center mt-8">
           <button 
             onClick={loadMoreProducts}
-            className="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary-dark transition-colors duration-300"
+            className="bg-primary text-white px-8 py-3 rounded-md hover:bg-primary-dark transition-colors duration-300 font-medium"
           >
             Load More Products
           </button>

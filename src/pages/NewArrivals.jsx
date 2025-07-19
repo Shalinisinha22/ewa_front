@@ -51,7 +51,7 @@ const NewArrivals = () => {
         {/* New Arrivals Grid */}
         <div className="mb-8">
           <h3 className="text-xl font-medium mb-6">
-            Latest Products ({newProducts.length} items)
+            {newProducts.length} Latest Products
           </h3>
           <div className="mt-6">
             <ProductCards products={newProducts} />

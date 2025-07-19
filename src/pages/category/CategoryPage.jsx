@@ -6,7 +6,6 @@ import ProductCards from '../shop/ProductCards';
 const CategoryPage = () => {
     const {category} = useParams();
     const [filteredProducts, setFilteredProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
     console.log(category)
 
     useEffect(() => {       
@@ -21,10 +20,15 @@ const CategoryPage = () => {
     <>
      <section className='section__container bg-primary-light' >
         <h2 className='section__header capitalize'>{category}</h2>
-        <p className='section__subheader'>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Esse odit alias eaque incidunt possimus laudantium optio rerum quasi voluptates eos!</p>
+        <p className='section__subheader'>Explore our curated collection of {category} items. Find the perfect pieces to enhance your style and express your personality.</p>
      </section>
 
      <div className='section__container'>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-medium">
+            {filteredProducts.length} Products Found
+          </h3>
+        </div>
         <div className="mt-10">
           <ProductCards products={filteredProducts} />
         </div>

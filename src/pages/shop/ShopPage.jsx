@@ -83,9 +83,7 @@ const ShopPage = () => {
       <section className="section__container bg-primary-light">
         <h2 className="section__header capitalize">Shop Products</h2>
         <p className="section__subheader">
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Esse odit
-          alias eaque incidunt possimus laudantium optio rerum quasi voluptates
-          eos!
+          Discover our complete collection of fashion items. Use filters to find exactly what you're looking for.
         </p>
       </section>
 
@@ -102,10 +100,10 @@ const ShopPage = () => {
           {/* right */}
           <div>
             <h3 className="text-xl font-medium mb-4">
-              Products Available {products.length}
+              {products.length} Products Available
             </h3>
             <div className="mt-6">
-              <ProductCard products={products} />
+              <ProductCards products={products} />
             </div>
           </div>
         </div>
