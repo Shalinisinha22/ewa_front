@@ -4,6 +4,7 @@ import Categories from './Categories';
 import HeroSection from './HeroSection';
 import TrendingProducts from '../shop/TrendingProducts';
 import PromoBanner from './PromoBanner';
+import BlogSection from './BlogSection';
 
 const Home = () => {
   return (
@@ -13,6 +14,7 @@ const Home = () => {
       <HeroSection></HeroSection>
       <TrendingProducts></TrendingProducts>
       <PromoBanner></PromoBanner>
+      <BlogSection></BlogSection>
     </>
   );
 }

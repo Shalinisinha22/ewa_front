@@ -1,10 +1,5 @@
 import React from 'react';
-import instaImg1 from '../assets/instagram-1.jpg';
-import instaImg2 from '../assets/instagram-2.jpg';   
-import instaImg3 from '../assets/instagram-3.jpg';
-import instaImg4 from '../assets/instagram-4.jpg';
-import instaImg5 from '../assets/instagram-5.jpg';
-import instaImg6 from '../assets/instagram-6.jpg';
+
 const Footer = () => {
   return (
     <>
@@ -34,6 +29,7 @@ const Footer = () => {
         <a href='/privacy-policy'>Privacy Policy</a>
         <a href='/terms-conditions'>Terms & Conditions</a>
         <a href='/return-policy'>Return & Refund Policy</a>
+        <a href='/shipping-policy'>Shipping Policy</a>
     </div>
 
 
@@ -48,16 +44,15 @@ const Footer = () => {
     </div>
 
     <div className='footer__col'>
-        <h4>INSTAGRAM</h4>
-  <div className='instagram__grid'>
-    <img src={instaImg1} alt='insta1' />
-    <img src={instaImg2} alt='insta2' />
-    <img src={instaImg3} alt='insta3' />
-    <img src={instaImg4} alt='insta4' />
-    <img src={instaImg5} alt='insta5' />
-    <img src={instaImg6} alt='insta6' />
-
-  </div>
+        <h4>SITEMAP</h4>
+        <a href='/'>Home</a>
+        <a href='/shop'>Shop</a>
+        <a href='/categories/accessories'>Accessories</a>
+        <a href='/categories/dress'>Dresses</a>
+        <a href='/categories/jewellery'>Jewellery</a>
+        <a href='/categories/cosmetics'>Cosmetics</a>
+        <a href='/blog'>Blog</a>
+        <a href='/contact'>Contact</a>
     </div>
     </footer>
     <div className='footer__bar'>

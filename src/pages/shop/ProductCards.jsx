@@ -7,6 +7,7 @@ import { addToCart } from '../../redux/cartSlice';
 const ProductCards = ({products}) => {
   const dispatch = useDispatch();
   const [showNotification, setShowNotification] = useState(null);
+  const [wishlist, setWishlist] = useState([]);
   const cart = useSelector((state) => state.cart);
 
   const getCartQuantity = (productId) => {
@@ -22,6 +23,17 @@ const ProductCards = ({products}) => {
     );
   };
 
+  const isInWishlist = (productId) => {
+    return wishlist.includes(productId);
+  };
+
+  const handleWishlistToggle = (productId) => {
+    setWishlist(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
   const handleAddToCart = (product) => {
       const productToAdd = {
         ...product,
@@ -45,7 +57,20 @@ const ProductCards = ({products}) => {
                              className='max-h-96 md:h-64 w-full object-cover hover:scale-105 transition-all duration-300'/>
                     </Link>
 
-                    <div className='absolute top-2 right-3'>
+                    <div className='absolute top-2 right-3 flex flex-col gap-2'>
+                       {/* Wishlist Button */}
+                       <button 
+                         onClick={() => handleWishlistToggle(product.id || product._id)}
+                         className={`p-1.5 rounded-full transition-all duration-300 ${
+                           isInWishlist(product.id || product._id) 
+                             ? 'bg-red-500 text-white' 
+                             : 'bg-white text-gray-600 hover:bg-red-500 hover:text-white'
+                         }`}
+                       >
+                         <i className={`${isInWishlist(product.id || product._id) ? 'ri-heart-fill' : 'ri-heart-line'}`}></i>
+                       </button>
+                       
+                       {/* Cart Button */}
                        <button 
                          onClick={() => handleAddToCart(product)}
                          className={`relative ${isInCart(product.id || product._id) ? 'opacity-80' : ''}`}
