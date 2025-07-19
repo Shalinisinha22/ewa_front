@@ -29,7 +29,7 @@ const ShopFiltering = ({filters,filteredState,setFilteredState,clearFilters}) =>
             <h4 className='font-medium text-lg'>Colors</h4>
             <hr></hr>
             {
-                filters.colors.map((color) => (
+                filters.colors.filter(color => color !== "all").map((color) => (
                     <label key={color} className='capitalize cursor-pointer'>
                        <input className='text-black' type="radio" name="color" id="color" value={color} checked={filteredState.colors===color}
                           onChange={(e)=>setFilteredState({...filteredState,colors:e.target.value})}
@@ -40,6 +40,12 @@ const ShopFiltering = ({filters,filteredState,setFilteredState,clearFilters}) =>
                     </label>
                 ))
             }
+            <label className='capitalize cursor-pointer'>
+               <input className='text-black' type="radio" name="color" id="color" value="all" checked={filteredState.colors==="all"}
+                  onChange={(e)=>setFilteredState({...filteredState,colors:e.target.value})}
+               ></input>
+               <span className='ml-1'>All Colors</span>
+            </label>
         </div>
 
 {/* price */}
