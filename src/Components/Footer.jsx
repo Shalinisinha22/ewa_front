@@ -57,14 +57,14 @@ const Footer = () => {
                 title="Store Location"
             ></iframe>
         </div>
-        <a href='/'>Home</a>
+{/*         <a href='/'>Home</a>
         <a href='/shop'>Shop</a>
         <a href='/categories/accessories'>Accessories</a>
         <a href='/categories/dress'>Dresses</a>
         <a href='/categories/jewellery'>Jewellery</a>
         <a href='/categories/cosmetics'>Cosmetics</a>
         <a href='/blog'>Blog</a>
-        <a href='/contact'>Contact</a>
+        <a href='/contact'>Contact</a> */}
     </div>
     </footer>
     <div className='footer__bar'>
