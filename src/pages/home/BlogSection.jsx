@@ -4,37 +4,44 @@ import blogs from '../../data/blogs.json';
 
 const BlogSection = () => {
   return (
-    <section className="section__container blog__container">
-      <h2 className="section__header">Latest From Our Blog</h2>
-      <p className="section__subheader mb-12">
-        Stay updated with the latest fashion trends, styling tips, and industry insights from our fashion experts.
-      </p>
+    <section className="max-w-screen-2xl mx-auto px-4 py-16">
+      <div className="max-w-2xl mx-auto text-center mb-12">
+        <h2 className="text-3xl font-bold mb-4">Latest From Our Blog</h2>
+        <p className="text-gray-600">
+          Stay updated with the latest fashion trends, styling tips, and industry insights from our fashion experts.
+        </p>
+      </div>
 
-      <div className="blog__grid">
-        {blogs.slice(0, 3).map((blog) => (
-          <div key={blog.id} className="blog__card">
-            <div className="blog__image">
-              <img src={blog.imageUrl} alt={blog.title} className="w-full h-48 object-cover" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {blogs.slice(0, 4).map((blog) => (
+          <div key={blog.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="relative h-48">
+              <img 
+                src={blog.imageUrl} 
+                alt={blog.title} 
+                className="w-full h-full object-cover"
+              />
             </div>
-            <div className="blog__card__content">
-              <h6>{blog.subtitle}</h6>
-              <h4>{blog.title}</h4>
-              <p>{blog.date}</p>
+            <div className="p-6">
+              <p className="text-sm text-primary mb-2">{blog.subtitle}</p>
+              <h3 className="text-lg font-semibold mb-2 line-clamp-2">{blog.title}</h3>
+              <p className="text-sm text-gray-500 mb-4">{blog.date}</p>
               <Link 
                 to={`/blog/${blog.id}`} 
-                className="inline-block mt-3 text-primary hover:text-primary-dark font-medium"
+                className="inline-flex items-center text-primary hover:text-primary-dark font-medium"
               >
-                Read More →
+                Read More 
+                <span className="ml-2">→</span>
               </Link>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="text-center mt-8">
+      <div className="text-center mt-12">
         <Link 
           to="/blog" 
-          className="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary-dark transition-colors duration-300"
+          className="inline-block px-8 py-3 bg-primary text-white font-medium rounded-md hover:bg-primary/90 transition-colors duration-300"
         >
           View All Posts
         </Link>

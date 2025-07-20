@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Ratingstars from '../../Components/Ratingstars'
-import { addToCart } from '../../redux/cartSlice';
+import { addToCart, removeFromCart, decreaseCart } from '../../redux/cartSlice';
 
 const ProductCards = ({products}) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [showNotification, setShowNotification] = useState(null);
   const [wishlist, setWishlist] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
@@ -87,7 +88,7 @@ const ProductCards = ({products}) => {
           const productId = product.id || product._id;
           const media = getProductMedia(product);
           const currentIndex = currentImageIndex[productId] || 0;
-          
+          const qty = getCartQuantity(productId);
           return (
             <div key={productId} className='product__card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300'>
               <div className='relative group'>
@@ -177,31 +178,93 @@ const ProductCards = ({products}) => {
               {/* Product Info */}
               <div className='p-4'>
                 <Link to={`/shop/${productId}`}>
-                  <h4 className='font-semibold text-lg mb-2 hover:text-primary transition-colors'>{product.name}</h4>
+                  <h4 className='font-semibold text-lg mb-1 hover:text-primary transition-colors'>{product.name}</h4>
                 </Link>
-                
+                {/* Brand and Category */}
+                <div className='text-xs text-gray-500 mb-1'>{product.brand} &bull; {product.category}</div>
                 <div className='flex items-center gap-2 mb-2'>
                   <span className='text-primary font-bold text-lg'>${product.price}</span>
                   {product.oldPrice && (
                     <span className='text-gray-500 line-through text-sm'>${product.oldPrice}</span>
                   )}
+                  {/* Offer badge */}
+                  {product.offers && product.offers.length > 0 && (
+                    <span className='ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded'>
+                      {product.offers[0]}
+                    </span>
+                  )}
                 </div>
-                
+                {/* Material */}
+                {product.material && (
+                  <div className='text-xs text-gray-600 mb-1'>Material: {product.material}</div>
+                )}
+                {/* Features as badges */}
+                {product.features && product.features.length > 0 && (
+                  <div className='flex flex-wrap gap-1 mb-2'>
+                    {product.features.slice(0,2).map((feature, idx) => (
+                      <span key={idx} className='bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded'>{feature}</span>
+                    ))}
+                  </div>
+                )}
+                {/* Low stock warning */}
+                {product.stock <= 3 && product.stock > 0 && (
+                  <div className='text-xs text-red-500 mb-1'>Only {product.stock} left in stock!</div>
+                )}
+                {/* Delivery info */}
+                {product.deliveryInfo && (
+                  <div className='text-xs text-gray-400 mb-2'>{product.deliveryInfo}</div>
+                )}
                 <Ratingstars rating={product.rating} />
-                
-                {/* Add to Cart Button */}
-                <button 
-                  onClick={() => handleAddToCart(product)}
-                  className={`w-full mt-3 py-2 px-4 rounded-md font-medium transition-all duration-300 ${
-                    isInCart(productId)
-                      ? 'bg-green-500 hover:bg-green-600 text-white'
-                      : 'bg-primary hover:bg-primary-dark text-white'
-                  }`}
-                >
-                  {isInCart(productId) 
-                    ? `In Cart (${getCartQuantity(productId)})` 
-                    : 'Add to Cart'}
-                </button>
+                {/* Cart Quantity Controls and Go to Cart */}
+                <div className='mt-3 flex flex-col gap-2'>
+                  {isInCart(productId) ? (
+                    <>
+                      <div className='flex items-center justify-center w-full border rounded-full bg-white overflow-hidden'>
+                        <button
+                          className='flex-1 py-2 text-lg font-bold text-primary hover:bg-primary hover:text-white transition-colors duration-200 rounded-none'
+                          style={{ borderRight: '1px solid #eee' }}
+                          onClick={() => {
+                            if (qty === 1) {
+                              dispatch(removeFromCart(product));
+                            } else {
+                              dispatch(decreaseCart(product));
+                            }
+                          }}
+                          aria-label='Decrease quantity'
+                        >
+                          -
+                        </button>
+                        <span className='flex-1 py-2 text-lg text-center select-none'>{qty}</span>
+                        <button
+                          className='flex-1 py-2 text-lg font-bold text-primary hover:bg-primary hover:text-white transition-colors duration-200 rounded-none'
+                          style={{ borderLeft: '1px solid #eee' }}
+                          onClick={() => handleAddToCart(product)}
+                          aria-label='Increase quantity'
+                          disabled={qty >= (product.stock || 99)}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <button
+                        className='w-full py-2 rounded font-medium bg-primary hover:bg-primary-dark text-white transition-colors duration-300 mt-2'
+                        onClick={() => navigate('/cart')}
+                      >
+                        Go to Cart
+                      </button>
+                    </>
+                  ) : (
+                    product.stock === 0 ? (
+                      <div className='w-full py-2.5 px-4 rounded-full font-medium bg-gray-200 text-gray-500 text-center'>Out of Stock</div>
+                    ) : (
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className='w-full py-2.5 px-4 rounded-full font-medium transition-all duration-300 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white'
+                      >
+                        Add to Cart
+                      </button>
+                    )
+                  )}
+                </div>
               </div>
             </div>
           );

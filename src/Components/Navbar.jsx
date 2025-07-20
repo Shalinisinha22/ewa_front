@@ -19,7 +19,7 @@ const Navbar = () => {
      <ul className='nav__links'>
         <li className='link'><Link to="/new-arrivals">New Arrivals</Link></li>
         <li className='link relative group'>
-          <Link to="/shop" className="flex items-center">
+          <Link to="/" className="flex items-center">
             Shop <i className="ri-arrow-down-s-line ml-1"></i>
           </Link>
           <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">

@@ -17,8 +17,10 @@ const cartSlice = createSlice({
             );
 
             if (itemIndex >= 0) {
-                // If item exists, increase quantity
-                state.cartItems[itemIndex].cartQuantity += 1;
+                // If item exists, increase quantity only if less than stock
+                if (state.cartItems[itemIndex].cartQuantity < (action.payload.stock || 99)) {
+                    state.cartItems[itemIndex].cartQuantity += 1;
+                }
             } else {
                 // If item doesn't exist, add new item with quantity 1
                 const tempProduct = { ...action.payload, cartQuantity: 1 };
@@ -34,23 +36,25 @@ const cartSlice = createSlice({
         },
         removeFromCart(state, action) {
             const updatedCartItems = state.cartItems.filter(
-                (item) => item._id !== action.payload._id
+                (item) => item._id !== action.payload._id && item.id !== action.payload.id
             );
             state.cartItems = updatedCartItems;
             localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
         },
         decreaseCart(state, action) {
             const itemIndex = state.cartItems.findIndex(
-                (item) => item._id === action.payload._id
+                (item) => item._id === action.payload._id || item.id === action.payload.id
             );
-            if (state.cartItems[itemIndex].cartQuantity > 1) {
-                state.cartItems[itemIndex].cartQuantity -= 1;
-            } else {
-                state.cartItems = state.cartItems.filter(
-                    (item) => item._id !== action.payload._id
-                );
+            if (itemIndex >= 0) {
+                if (state.cartItems[itemIndex].cartQuantity > 1) {
+                    state.cartItems[itemIndex].cartQuantity -= 1;
+                } else {
+                    state.cartItems = state.cartItems.filter(
+                        (item) => item._id !== action.payload._id && item.id !== action.payload.id
+                    );
+                }
+                localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
             }
-            localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
         },
         getTotals(state) {
             const { total, quantity } = state.cartItems.reduce(

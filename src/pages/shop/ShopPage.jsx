@@ -105,7 +105,7 @@ const ShopPage = () => {
             <div className="mt-6">
               <ProductCards products={products} />
             </div>
-          </div>
+          </div>hb 
         </div>
       </section>
     </>

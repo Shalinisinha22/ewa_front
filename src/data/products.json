@@ -9,7 +9,19 @@
     "image": "https://images.unsplash.com/photo-1512201078372-9c6b2a0d528a?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "black",
     "rating": 4.5,
-    "author":"admin"
+    "author": "admin",
+    "brand": "UrbanStyle",
+    "material": "Genuine Leather",
+    "size": ["One Size"],
+    "careInstructions": "Wipe with a clean, dry cloth",
+    "availability": "In Stock",
+    "sku": "US-HB-001",
+    "countryOfOrigin": "India",
+    "warranty": "6 months",
+    "deliveryInfo": "Delivered in 3-5 business days",
+    "offers": ["10% off on first purchase", "Free shipping above ₹500"],
+    "features": ["Adjustable strap", "Multiple compartments", "Magnetic closure"],
+    "stock": 10
   },
   {
     "id": 2,
@@ -20,7 +32,19 @@
     "oldPrice": 199.99,
     "image": "https://images.unsplash.com/photo-1568251188392-ae32f898cb3b?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "red",
-    "rating": 4.0
+    "rating": 4.0,
+    "brand": "GlamourWear",
+    "material": "Silk Blend",
+    "size": ["S", "M", "L", "XL"],
+    "careInstructions": "Dry clean only",
+    "availability": "In Stock",
+    "sku": "GW-EG-2024",
+    "countryOfOrigin": "India",
+    "warranty": "No warranty",
+    "deliveryInfo": "Delivered in 3-5 business days",
+    "offers": ["Extra 10% off on prepaid orders", "Free shipping above ₹500"],
+    "features": ["Off-shoulder design", "Embroidered details", "Floor length"],
+    "stock": 5
   },
   {
     "id": 3,
@@ -30,7 +54,19 @@
     "price": 199.99,
     "image": "https://images.unsplash.com/photo-1631097969294-c38afba59496?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "gold",
-    "rating": 4.7
+    "rating": 4.7,
+    "brand": "RoyalJewels",
+    "material": "22K Gold",
+    "size": ["16 inch", "18 inch"],
+    "careInstructions": "Keep away from chemicals",
+    "availability": "In Stock",
+    "sku": "RJ-GN-003",
+    "countryOfOrigin": "India",
+    "warranty": "1 year",
+    "deliveryInfo": "Delivered in 5-7 business days",
+    "offers": ["5% off on gold jewellery", "Free gift box"],
+    "features": ["Handcrafted", "Hallmarked", "Elegant design"],
+    "stock": 15
   },
   {
     "id": 4,
@@ -40,7 +76,19 @@
     "price": 19.99,
     "image": "https://images.unsplash.com/photo-1631214500115-598fc2cb8d2d?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "red",
-    "rating": 4.2
+    "rating": 4.2,
+    "brand": "BeautyBliss",
+    "material": "Vegan Formula",
+    "size": ["3.5g"],
+    "careInstructions": "Store in a cool, dry place",
+    "availability": "In Stock",
+    "sku": "BB-ML-004",
+    "countryOfOrigin": "India",
+    "warranty": "No warranty",
+    "deliveryInfo": "Delivered in 2-4 business days",
+    "offers": ["Buy 2 Get 1 Free", "Free shipping above ₹300"],
+    "features": ["Smudge-proof", "Rich color", "Long-lasting"],
+    "stock": 20
   },
   {
     "id": 5,
@@ -51,7 +99,19 @@
     "oldPrice": 39.99,
     "image": "https://images.unsplash.com/photo-1485527691629-8e370684924c?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "blue",
-    "rating": 4.3
+    "rating": 4.3,
+    "brand": "SilkRoute",
+    "material": "100% Silk",
+    "size": ["70x180cm"],
+    "careInstructions": "Hand wash only",
+    "availability": "In Stock",
+    "sku": "SR-SS-005",
+    "countryOfOrigin": "India",
+    "warranty": "No warranty",
+    "deliveryInfo": "Delivered in 3-5 business days",
+    "offers": ["15% off on scarves", "Free shipping above ₹500"],
+    "features": ["Soft texture", "Vibrant print", "Lightweight"],
+    "stock": 10
   },
   {
     "id": 6,
@@ -61,7 +121,19 @@
     "price": 89.99,
     "image": "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "black",
-    "rating": 4.4
+    "rating": 4.4,
+    "brand": "PartyChic",
+    "material": "Polyester",
+    "size": ["S", "M", "L"],
+    "careInstructions": "Machine wash cold",
+    "availability": "In Stock",
+    "sku": "PC-CD-006",
+    "countryOfOrigin": "India",
+    "warranty": "No warranty",
+    "deliveryInfo": "Delivered in 3-5 business days",
+    "offers": ["20% off on dresses", "Free shipping above ₹500"],
+    "features": ["A-line fit", "Sleeveless", "Knee length"],
+    "stock": 8
   },
   {
     "id": 7,
@@ -72,7 +144,19 @@
     "oldPrice": 349.99,
     "image": "https://images.unsplash.com/photo-1587467442586-7bcc51828a10?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "silver",
-    "rating": 4.8
+    "rating": 4.8,
+    "brand": "ShineBright",
+    "material": "18K White Gold & Diamonds",
+    "size": ["Standard"],
+    "careInstructions": "Store in a jewelry box",
+    "availability": "In Stock",
+    "sku": "SB-DE-007",
+    "countryOfOrigin": "India",
+    "warranty": "2 years",
+    "deliveryInfo": "Delivered in 5-7 business days",
+    "offers": ["10% off on diamond jewellery", "Free insurance"],
+    "features": ["Certified diamonds", "Elegant design", "Gift box included"],
+    "stock": 12
   },
   {
     "id": 8,
@@ -82,7 +166,19 @@
     "price": 39.99,
     "image": "https://images.unsplash.com/photo-1599733589046-10c005739ef9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "beige",
-    "rating": 4.1
+    "rating": 4.1,
+    "brand": "GlowUp",
+    "material": "Mineral Formula",
+    "size": ["30ml"],
+    "careInstructions": "Store in a cool, dry place",
+    "availability": "In Stock",
+    "sku": "GU-F-008",
+    "countryOfOrigin": "India",
+    "warranty": "No warranty",
+    "deliveryInfo": "Delivered in 2-4 business days",
+    "offers": ["Buy 1 Get 1 50% Off", "Free shipping above ₹300"],
+    "features": ["Full coverage", "Matte finish", "Long-lasting"],
+    "stock": 15
   },
   {
     "id": 9,
@@ -92,7 +188,19 @@
     "price": 49.99,
     "image": "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "black",
-    "rating": 4.6
+    "rating": 4.6,
+    "brand": "SunGuard",
+    "material": "Polycarbonate",
+    "size": ["Medium"],
+    "careInstructions": "Clean with soft cloth",
+    "availability": "In Stock",
+    "sku": "SG-S-009",
+    "countryOfOrigin": "India",
+    "warranty": "1 year",
+    "deliveryInfo": "Delivered in 3-5 business days",
+    "offers": ["Flat 20% off", "Free case included"],
+    "features": ["UV400 protection", "Lightweight", "Trendy design"],
+    "stock": 20
   },
   {
     "id": 10,
@@ -103,6 +211,18 @@
     "oldPrice": 79.99,
     "image": "https://plus.unsplash.com/premium_photo-1664298355914-bc65d2c9af64?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "color": "green",
-    "rating": 4.2
+    "rating": 4.2,
+    "brand": "ComfyWear",
+    "material": "Cotton Blend",
+    "size": ["S", "M", "L", "XL"],
+    "careInstructions": "Machine wash cold",
+    "availability": "In Stock",
+    "sku": "CW-CP-010",
+    "countryOfOrigin": "India",
+    "warranty": "No warranty",
+    "deliveryInfo": "Delivered in 3-5 business days",
+    "offers": ["10% off on pants", "Free shipping above ₹500"],
+    "features": ["Elastic waistband", "Breathable fabric", "Relaxed fit"],
+    "stock": 10
   }
 ]
