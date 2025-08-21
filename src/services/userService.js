@@ -1,34 +1,42 @@
 import API from "../../api";
 
 const userService = {
-    // Public endpoints
+    // Customer auth endpoints
     async register(userData) {
-        return API.request(API.endpoints.users, {
+        return API.request(`${API.endpoints.customerAuth}/signup`, {
             method: 'POST',
             body: JSON.stringify(userData)
         });
     },
 
-    async login(email, password) {
-        return API.request(`${API.endpoints.users}/login`, {
+    async login(email, password, storeName) {
+        return API.request(`${API.endpoints.customerAuth}/login`, {
             method: 'POST',
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password, storeName })
         });
     },
 
-    // Protected endpoints
     async getProfile() {
-        return API.request(`${API.endpoints.users}/profile`, {
+        return API.request(`${API.endpoints.customerAuth}/profile`, {
             method: 'GET'
         });
     },
 
     async updateProfile(userData) {
-        return API.request(`${API.endpoints.users}/profile`, {
+        return API.request(`${API.endpoints.customerAuth}/profile`, {
             method: 'PUT',
             body: JSON.stringify(userData)
         });
     },
+
+    async changePassword(currentPassword, newPassword) {
+        return API.request(`${API.endpoints.customerAuth}/change-password`, {
+            method: 'PUT',
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+    },
+
+
 
     // Admin endpoints
     async getAllUsers() {

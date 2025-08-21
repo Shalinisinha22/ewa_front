@@ -16,9 +16,18 @@ const cartSlice = createSlice({
                 item => item.id === action.payload.id || item._id === action.payload._id
             );
 
+            // Helper function to get stock quantity from new stock structure
+            const getStockQuantity = (product) => {
+                if (product.stock && typeof product.stock === 'object' && product.stock.quantity !== undefined) {
+                    return product.stock.quantity;
+                }
+                // Fallback to old structure
+                return product.stock || 99;
+            };
+
             if (itemIndex >= 0) {
                 // If item exists, increase quantity only if less than stock
-                if (state.cartItems[itemIndex].cartQuantity < (action.payload.stock || 99)) {
+                if (state.cartItems[itemIndex].cartQuantity < getStockQuantity(action.payload)) {
                     state.cartItems[itemIndex].cartQuantity += 1;
                 }
             } else {
@@ -71,9 +80,15 @@ const cartSlice = createSlice({
             );
             state.cartTotalAmount = total;
             state.cartTotalQuantity = quantity;
+        },
+        clearCart(state) {
+            state.cartItems = [];
+            state.cartTotalQuantity = 0;
+            state.cartTotalAmount = 0;
+            localStorage.removeItem('cartItems');
         }
     },
 });
 
-export const { addToCart, removeFromCart, decreaseCart, getTotals } = cartSlice.actions;
+export const { addToCart, removeFromCart, decreaseCart, getTotals, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

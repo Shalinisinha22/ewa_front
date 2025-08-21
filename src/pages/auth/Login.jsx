@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import userService from '../../services/userService';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useCustomer } from '../../context/CustomerContext';
+import { getStoreNameFromTitle } from '../../utils/storeUtils';
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, error, loading } = useCustomer();
+  
+  // Get the return path from location state, or default to '/'
+  const from = location.state?.from || '/';
+
+
 
   const handleChange = (e) => {
     setFormData({
@@ -20,11 +27,11 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await userService.login(formData.email, formData.password);
-      localStorage.setItem('token', response.token);
-      navigate('/');
+      await login(formData.email, formData.password, getStoreNameFromTitle());
+      // Navigate to the attempted URL or home
+      navigate(from, { replace: true });
     } catch (err) {
-      setError(err.message || 'Login failed');
+      // Error is handled by the context
     }
   };
 
@@ -33,7 +40,9 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h2 className="text-3xl font-bold">Login</h2>
-          <p className="mt-2 text-gray-600">Welcome back! Please login to your account.</p>
+          <p className="mt-2 text-gray-600">
+            Welcome back! Please login to your account at <span className="font-semibold text-primary">{getStoreNameFromTitle()}</span>
+          </p>
         </div>
 
         {error && <div className="text-red-500 text-center">{error}</div>}
@@ -66,6 +75,7 @@ const Login = () => {
             />
           </div>
 
+
           {/* <div className="flex items-center justify-between"> */}
             {/* <div className="flex items-center">
               <input
@@ -88,9 +98,10 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90"
+            disabled={loading}
+            className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 disabled:opacity-50"
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

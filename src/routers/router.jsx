@@ -22,6 +22,9 @@ import BlogPost from "../pages/blog/BlogPost";
 
 import Profile from "../pages/profile/Profile";
 import Wishlist from "../pages/wishlist/Wishlist";
+import CheckoutPage from "../pages/checkout/CheckoutPage";
+import OrderConfirmationPage from "../pages/checkout/OrderConfirmationPage";
+import CustomerOrders from "../pages/profile/CustomerOrders";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +60,30 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <CartScreen />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "/checkout",
+        element: (
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "/order-confirmation/:orderId",
+        element: (
+          <ProtectedRoute>
+            <OrderConfirmationPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "/orders",
+        element: (
+          <ProtectedRoute>
+            <CustomerOrders />
           </ProtectedRoute>
         )
       },
@@ -108,12 +135,7 @@ const router = createBrowserRouter([
             <Profile />
           </ProtectedRoute>
         )
-      }
-    ]
-  },
-  {
-    element: <AuthLayout />,
-    children: [
+      },
       {
         path: "/login",
         element: <Login />

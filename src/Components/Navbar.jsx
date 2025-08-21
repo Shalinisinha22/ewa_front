@@ -1,16 +1,51 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { getTotals } from '../redux/cartSlice'
+import { useStore } from '../context/StoreContext';
+// import API from '../../../api'
+import API from '../../api'
 
 const Navbar = () => {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+  const { currentStore } = useStore();
   const user = localStorage.getItem('token'); // Get user token
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     dispatch(getTotals());
-  }, [cart, dispatch]);
+    if (currentStore) {
+      fetchCategories();
+    }
+  }, [cart, dispatch, currentStore]);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await API.request(`${API.endpoints.publicCategories}?store=${currentStore.name}`);
+      // Filter only active categories and sort by sortOrder
+      const activeCategories = (response.categories || response || [])
+        .filter(cat => cat.status === 'active')
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(category => ({
+          ...category,
+          name: category.name || 'Unnamed Category',
+          slug: category.slug || category.name?.toLowerCase().replace(/\s+/g, '-') || 'unnamed-category'
+        }));
+      setCategories(activeCategories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      // Fallback to default categories if API fails
+      setCategories([
+        { name: 'Women', slug: 'womens' },
+        { name: "Men's", slug: 'mens' }
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <header className=''>
@@ -23,10 +58,19 @@ const Navbar = () => {
             Shop <i className="ri-arrow-down-s-line ml-1"></i>
           </Link>
           <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-            <Link to="/categories/accessories" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Accessories</Link>
-            <Link to="/categories/dress" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Dress Collection</Link>
-            <Link to="/categories/jewellery" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Jewellery</Link>
-            <Link to="/categories/cosmetics" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cosmetics</Link>
+            {loading ? (
+              <div className="px-4 py-2 text-gray-500">Loading...</div>
+            ) : (
+              categories.map((category) => (
+                <Link 
+                  key={category._id || category.slug} 
+                  to={`/categories/${category.slug}`} 
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  {category.name}
+                </Link>
+              ))
+            )}
           </div>
         </li>
         {/* <li className='link'><Link to="/">Pages</Link></li> */}

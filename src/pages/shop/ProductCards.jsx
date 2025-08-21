@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Ratingstars from '../../Components/Ratingstars'
 import { addToCart, removeFromCart, decreaseCart } from '../../redux/cartSlice';
+// import API from '../../../api';
+import API from '../../../api';
 
 const ProductCards = ({products}) => {
   const dispatch = useDispatch();
@@ -12,21 +14,61 @@ const ProductCards = ({products}) => {
   const [currentImageIndex, setCurrentImageIndex] = useState({});
   const cart = useSelector((state) => state.cart);
 
-  // Sample media for each product (5 images + 1 video)
-  const getProductMedia = (product) => [
-    { type: 'image', src: product.image },
-    { type: 'image', src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=400&auto=format&fit=crop' },
-    { type: 'image', src: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=400&auto=format&fit=crop' },
-    { type: 'image', src: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=400&auto=format&fit=crop' },
-    { type: 'image', src: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=400&auto=format&fit=crop' },
-    { type: 'video', src: 'https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c0fd273d2c6d9a064f3ae35579b2bbdf&profile_id=139&oauth2_token_id=57447761' }
-  ];
+  // Get product media from actual product images
+  const getProductMedia = (product) => {
+    const media = [];
+    
+    // Add actual product images
+    if (product.images && product.images.length > 0) {
+      product.images.forEach(image => {
+        media.push({ 
+          type: 'image', 
+          src: image.startsWith('http') ? image : API.getImageUrl(image)
+        });
+      });
+    }
+    
+    // If no images, use the single image field
+    if (media.length === 0 && product.image) {
+      media.push({ type: 'image', src: product.image });
+    }
+    
+    // If still no images, add placeholder
+    if (media.length === 0) {
+      media.push({ 
+        type: 'image', 
+        src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=400&auto=format&fit=crop' 
+      });
+    }
+    
+    return media;
+  };
 
   const getCartQuantity = (productId) => {
     const cartItem = cart.cartItems.find(
       item => item.id === productId || item._id === productId
     );
     return cartItem ? cartItem.cartQuantity : 0;
+  };
+
+  // Helper function to get stock quantity from new stock structure
+  const getStockQuantity = (product) => {
+    if (product.stock && typeof product.stock === 'object' && product.stock.quantity !== undefined) {
+      return product.stock.quantity;
+    }
+    // Fallback to old structure
+    return product.stock || 0;
+  };
+
+  // Helper function to check if stock is low
+  const isLowStock = (product) => {
+    if (product.stock && typeof product.stock === 'object') {
+      const quantity = product.stock.quantity || 0;
+      const threshold = product.stock.lowStockThreshold || 3;
+      return quantity <= threshold && quantity > 0;
+    }
+    // Fallback to old structure
+    return (product.stock || 0) <= 3 && (product.stock || 0) > 0;
   };
 
   const isInCart = (productId) => {
@@ -112,23 +154,29 @@ const ProductCards = ({products}) => {
                   )}
                   
                   {/* Navigation Arrows */}
-                  <button 
-                    onClick={() => prevImage(productId)}
-                    className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity'
-                  >
-                    <i className="ri-arrow-left-s-line text-sm"></i>
-                  </button>
-                  <button 
-                    onClick={() => nextImage(productId)}
-                    className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity'
-                  >
-                    <i className="ri-arrow-right-s-line text-sm"></i>
-                  </button>
+                  {media.length > 1 && (
+                    <>
+                      <button 
+                        onClick={() => prevImage(productId)}
+                        className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity'
+                      >
+                        <i className="ri-arrow-left-s-line text-sm"></i>
+                      </button>
+                      <button 
+                        onClick={() => nextImage(productId)}
+                        className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity'
+                      >
+                        <i className="ri-arrow-right-s-line text-sm"></i>
+                      </button>
+                    </>
+                  )}
                   
                   {/* Media Counter */}
-                  <div className='absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity'>
-                    {currentIndex + 1} / {media.length}
-                  </div>
+                  {media.length > 1 && (
+                    <div className='absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity'>
+                      {currentIndex + 1} / {media.length}
+                    </div>
+                  )}
 
                   {/* Wishlist Button */}
                   <button 
@@ -152,40 +200,36 @@ const ProductCards = ({products}) => {
                 </div>
 
                 {/* Thumbnail Navigation */}
-                <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-                  <div className='flex gap-1 justify-center'>
-                    {media.slice(0, 4).map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setImageIndex(productId, index)}
-                        className={`w-2 h-2 rounded-full transition-all ${
-                          currentIndex === index ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
-                        }`}
-                      />
-                    ))}
-                    {media.length > 4 && (
-                      <button
-                        onClick={() => setImageIndex(productId, 4)}
-                        className={`w-2 h-2 rounded-full transition-all ${
-                          currentIndex >= 4 ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
-                        }`}
-                      />
-                    )}
+                {media.length > 1 && (
+                  <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity'>
+                    <div className='flex gap-1 justify-center'>
+                      {media.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setImageIndex(productId, index)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            currentIndex === index ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Product Info */}
               <div className='p-4'>
-                <Link to={`/shop/${productId}`}>
+                <Link to={`/shop/${product._id || product.id}`}>
                   <h4 className='font-semibold text-lg mb-1 hover:text-primary transition-colors'>{product.name}</h4>
                 </Link>
                 {/* Brand and Category */}
-                <div className='text-xs text-gray-500 mb-1'>{product.brand} &bull; {product.category}</div>
+                <div className='text-xs text-gray-500 mb-1'>
+                  {product.brand} &bull; {product.category?.name || product.category}
+                </div>
                 <div className='flex items-center gap-2 mb-2'>
-                  <span className='text-primary font-bold text-lg'>${product.price}</span>
+                  <span className='text-primary font-bold text-lg'>₹{product.price}</span>
                   {product.oldPrice && (
-                    <span className='text-gray-500 line-through text-sm'>${product.oldPrice}</span>
+                    <span className='text-gray-500 line-through text-sm'>₹{product.oldPrice}</span>
                   )}
                   {/* Offer badge */}
                   {product.offers && product.offers.length > 0 && (
@@ -207,8 +251,8 @@ const ProductCards = ({products}) => {
                   </div>
                 )}
                 {/* Low stock warning */}
-                {product.stock <= 3 && product.stock > 0 && (
-                  <div className='text-xs text-red-500 mb-1'>Only {product.stock} left in stock!</div>
+                {isLowStock(product) && (
+                  <div className='text-xs text-red-500 mb-1'>Only {getStockQuantity(product)} left in stock!</div>
                 )}
                 {/* Delivery info */}
                 {product.deliveryInfo && (
@@ -240,7 +284,7 @@ const ProductCards = ({products}) => {
                           style={{ borderLeft: '1px solid #eee' }}
                           onClick={() => handleAddToCart(product)}
                           aria-label='Increase quantity'
-                          disabled={qty >= (product.stock || 99)}
+                          disabled={qty >= (getStockQuantity(product) || 99)}
                         >
                           +
                         </button>
@@ -253,7 +297,7 @@ const ProductCards = ({products}) => {
                       </button>
                     </>
                   ) : (
-                    product.stock === 0 ? (
+                    getStockQuantity(product) === 0 ? (
                       <div className='w-full py-2.5 px-4 rounded-full font-medium bg-gray-200 text-gray-500 text-center'>Out of Stock</div>
                     ) : (
                       <button
