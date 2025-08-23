@@ -27,7 +27,7 @@ const SingleProduct = () => {
     const [productMedia, setProductMedia] = useState([]);
     const cart = useSelector((state) => state.cart);
 
-    // Get product media from actual product images
+    // Get product media from actual product images and videos
     const getProductMedia = (product) => {
         const media = [];
         
@@ -41,12 +41,22 @@ const SingleProduct = () => {
             });
         }
         
-        // If no images, use the single image field
+        // Add product videos
+        if (product.videos && product.videos.length > 0) {
+            product.videos.forEach(video => {
+                media.push({ 
+                    type: 'video', 
+                    src: video.startsWith('http') ? video : API.getImageUrl(video)
+                });
+            });
+        }
+        
+        // If no images or videos, use the single image field
         if (media.length === 0 && product.image) {
             media.push({ type: 'image', src: product.image });
         }
         
-        // If still no images, add placeholder
+        // If still no media, add placeholder
         if (media.length === 0) {
             media.push({ 
                 type: 'image', 
@@ -258,13 +268,20 @@ const SingleProduct = () => {
                     alt={`${product.name} view ${currentImageIndex + 1}`}
                   />
                 ) : (
-                  <video 
-                    className='w-full h-full object-cover' 
-                    controls
-                    src={productMedia[currentImageIndex].src}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
+                  <div className='relative w-full h-full'>
+                    <video 
+                      className='w-full h-full object-cover' 
+                      controls
+                      src={productMedia[currentImageIndex].src}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                    {/* Video play indicator */}
+                    <div className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-sm flex items-center gap-1'>
+                      <i className="ri-play-fill"></i>
+                      Video
+                    </div>
+                  </div>
                 )}
                 
                 {/* Navigation Arrows */}
@@ -282,8 +299,11 @@ const SingleProduct = () => {
                 </button>
                 
                 {/* Image Counter */}
-                <div className='absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm'>
-                  {currentImageIndex + 1} / {productMedia.length}
+                <div className='absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1'>
+                  <span>{currentImageIndex + 1} / {productMedia.length}</span>
+                  {productMedia[currentImageIndex].type === 'video' && (
+                    <i className="ri-play-fill text-xs"></i>
+                  )}
                 </div>
               </div>
               
@@ -293,7 +313,7 @@ const SingleProduct = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all relative ${
                       currentImageIndex === index ? 'border-primary' : 'border-gray-200 hover:border-gray-400'
                     }`}
                   >
@@ -304,8 +324,12 @@ const SingleProduct = () => {
                         className='w-full h-full object-cover'
                       />
                     ) : (
-                      <div className='w-full h-full bg-gray-200 flex items-center justify-center'>
+                      <div className='w-full h-full bg-gray-200 flex items-center justify-center relative'>
                         <i className="ri-play-circle-line text-xl text-gray-600"></i>
+                        {/* Video indicator */}
+                        <div className='absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center'>
+                          <i className="ri-play-fill text-white text-xs"></i>
+                        </div>
                       </div>
                     )}
                   </button>

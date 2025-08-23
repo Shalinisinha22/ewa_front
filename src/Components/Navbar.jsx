@@ -53,6 +53,7 @@ const Navbar = () => {
 
      <ul className='nav__links'>
         <li className='link'><Link to="/new-arrivals">New Arrivals</Link></li>
+        {/* <li className='link'><Link to="/categories">Categories</Link></li> */}
         <li className='link relative group'>
           <Link to="/" className="flex items-center">
             Shop <i className="ri-arrow-down-s-line ml-1"></i>

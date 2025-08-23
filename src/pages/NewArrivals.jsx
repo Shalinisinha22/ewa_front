@@ -1,16 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import ProductCards from './shop/ProductCards';
-import products from '../data/products.json';
+import { useStore } from '../context/StoreContext';
+import API from '../../api';
+import Categories from './home/Categories';
 
 const NewArrivals = () => {
+  const { currentStore } = useStore();
   const [newProducts, setNewProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate new arrivals by taking the latest products
-    // In a real app, this would filter by a "dateAdded" field or similar
-    const latest = products.slice(-6); // Get last 6 products as "new arrivals"
-    setNewProducts(latest);
-  }, []);
+    if (currentStore) {
+      fetchNewArrivals();
+    }
+  }, [currentStore]);
+
+  const fetchNewArrivals = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await API.request(
+        `${API.endpoints.publicNewArrivals}?store=${currentStore.name}&limit=12`
+      );
+      
+      setNewProducts(response || []);
+    } catch (error) {
+      console.error('Error fetching new arrivals:', error);
+      setError('Failed to load new arrivals');
+      setNewProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,7 +51,7 @@ const NewArrivals = () => {
 
       <section className="section__container">
         {/* Featured New Arrival */}
-        <div className="mb-12">
+        {/* <div className="mb-12">
           <div className="bg-gradient-to-r from-primary-light to-extra-light rounded-lg p-8 text-center">
             <h3 className="text-2xl font-bold mb-4">✨ Just Dropped</h3>
             <p className="text-gray-600 mb-6">
@@ -46,50 +69,48 @@ const NewArrivals = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* New Arrivals Grid */}
         <div className="mb-8">
-          <h3 className="text-xl font-medium mb-6">
-            {newProducts.length} Latest Products
-          </h3>
-          <div className="mt-6">
-            <ProductCards products={newProducts} />
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading new arrivals...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-600 mb-4">{error}</p>
+              <button 
+                onClick={fetchNewArrivals}
+                className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : (
+            <>
+              <h3 className="text-xl font-medium mb-6">
+                {newProducts.length} Latest Products
+              </h3>
+              <div className="mt-6">
+                {newProducts.length > 0 ? (
+                  <ProductCards products={newProducts} />
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-600">No new arrivals available at the moment.</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Categories for New Arrivals */}
-        <div className="mt-16">
-          <h3 className="text-2xl font-bold text-center mb-8">Shop New Arrivals by Category</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center group cursor-pointer">
-              <div className="bg-gray-100 rounded-lg p-6 mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
-                <i className="ri-handbag-line text-3xl"></i>
-              </div>
-              <h4 className="font-medium">New Accessories</h4>
-            </div>
-            <div className="text-center group cursor-pointer">
-              <div className="bg-gray-100 rounded-lg p-6 mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
-                <i className="ri-shirt-line text-3xl"></i>
-              </div>
-              <h4 className="font-medium">Latest Dresses</h4>
-            </div>
-            <div className="text-center group cursor-pointer">
-              <div className="bg-gray-100 rounded-lg p-6 mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
-                <i className="ri-gem-line text-3xl"></i>
-              </div>
-              <h4 className="font-medium">New Jewellery</h4>
-            </div>
-            <div className="text-center group cursor-pointer">
-              <div className="bg-gray-100 rounded-lg p-6 mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
-                <i className="ri-palette-line text-3xl"></i>
-              </div>
-              <h4 className="font-medium">Fresh Cosmetics</h4>
-            </div>
-          </div>
-        </div>
+      
 
-        {/* Newsletter Signup */}
+        <Categories />
+
+        {/* Newsletter Signup
         <div className="mt-16 bg-primary-light rounded-lg p-8 text-center">
           <h3 className="text-2xl font-bold mb-4">Stay Updated</h3>
           <p className="text-gray-600 mb-6">
@@ -105,7 +126,7 @@ const NewArrivals = () => {
               Subscribe
             </button>
           </div>
-        </div>
+        </div> */}
       </section>
     </>
   );

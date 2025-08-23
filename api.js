@@ -13,6 +13,8 @@ const API = {
         products: `${BASE_API_URL}/products`,
         publicProducts: `${BASE_API_URL}/products/public`,
         publicProductsByCategory: `${BASE_API_URL}/products/public/category`,
+        publicNewArrivals: `${BASE_API_URL}/products/public/new-arrivals`,
+        publicTrending: `${BASE_API_URL}/products/public/trending`,
         categories: `${BASE_API_URL}/categories`,
         publicCategories: `${BASE_API_URL}/categories/public`,
         stores: `${BASE_API_URL}/stores`,
@@ -23,6 +25,8 @@ const API = {
         customerOrderDetails: `${BASE_API_URL}/customer/auth/orders`,
         auth: `${BASE_API_URL}/auth`,
         customerAuth: `${BASE_API_URL}/customer/auth`,
+        banners: `${BASE_API_URL}/banners`,
+        publicBanners: `${BASE_API_URL}/banners/public`,
         shippingSettings: `${BASE_API_URL}/customers/store/shipping`,
         paymentSettings: `${BASE_API_URL}/customers/store/payment`,
         taxSettings: `${BASE_API_URL}/customers/store/tax`
@@ -118,6 +122,11 @@ const API = {
     },
 
     getImageUrl(imagePath) {
+        // If the image path is already a complete URL (Cloudinary), return it as is
+        if (imagePath && (imagePath.startsWith('http://') || imagePath.startsWith('https://'))) {
+            return imagePath;
+        }
+        // Otherwise, prepend the backend URL (for legacy local uploads)
         return imagePath ? `${IMG_URL}${imagePath}` : null;
     }
 };

@@ -14,7 +14,7 @@ const ProductCards = ({products}) => {
   const [currentImageIndex, setCurrentImageIndex] = useState({});
   const cart = useSelector((state) => state.cart);
 
-  // Get product media from actual product images
+  // Get product media from actual product images and videos
   const getProductMedia = (product) => {
     const media = [];
     
@@ -28,12 +28,22 @@ const ProductCards = ({products}) => {
       });
     }
     
-    // If no images, use the single image field
+    // Add product videos
+    if (product.videos && product.videos.length > 0) {
+      product.videos.forEach(video => {
+        media.push({ 
+          type: 'video', 
+          src: video.startsWith('http') ? video : API.getImageUrl(video)
+        });
+      });
+    }
+    
+    // If no images or videos, use the single image field
     if (media.length === 0 && product.image) {
       media.push({ type: 'image', src: product.image });
     }
     
-    // If still no images, add placeholder
+    // If still no media, add placeholder
     if (media.length === 0) {
       media.push({ 
         type: 'image', 
@@ -143,14 +153,22 @@ const ProductCards = ({products}) => {
                       className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
                     />
                   ) : (
-                    <video 
-                      className='w-full h-full object-cover' 
-                      controls
-                      muted
-                      src={media[currentIndex].src}
-                    >
-                      Your browser does not support the video tag.
-                    </video>
+                    <div className='relative w-full h-full'>
+                      <video 
+                        className='w-full h-full object-cover' 
+                        controls
+                        muted
+                        src={media[currentIndex].src}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                      {/* Video play indicator */}
+                      <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
+                        <div className='bg-black bg-opacity-30 rounded-full p-2'>
+                          <i className="ri-play-fill text-white text-2xl"></i>
+                        </div>
+                      </div>
+                    </div>
                   )}
                   
                   {/* Navigation Arrows */}
@@ -173,8 +191,11 @@ const ProductCards = ({products}) => {
                   
                   {/* Media Counter */}
                   {media.length > 1 && (
-                    <div className='absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity'>
-                      {currentIndex + 1} / {media.length}
+                    <div className='absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1'>
+                      <span>{currentIndex + 1} / {media.length}</span>
+                      {media[currentIndex].type === 'video' && (
+                        <i className="ri-play-fill text-xs"></i>
+                      )}
                     </div>
                   )}
 
@@ -203,14 +224,21 @@ const ProductCards = ({products}) => {
                 {media.length > 1 && (
                   <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity'>
                     <div className='flex gap-1 justify-center'>
-                      {media.map((_, index) => (
+                      {media.map((mediaItem, index) => (
                         <button
                           key={index}
                           onClick={() => setImageIndex(productId, index)}
-                          className={`w-2 h-2 rounded-full transition-all ${
+                          className={`w-2 h-2 rounded-full transition-all relative ${
                             currentIndex === index ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
                           }`}
-                        />
+                          title={mediaItem.type === 'video' ? 'Video' : 'Image'}
+                        >
+                          {mediaItem.type === 'video' && (
+                            <div className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center'>
+                              <i className="ri-play-fill text-white text-xs"></i>
+                            </div>
+                          )}
+                        </button>
                       ))}
                     </div>
                   </div>

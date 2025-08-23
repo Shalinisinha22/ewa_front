@@ -17,6 +17,7 @@ import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import ProtectedRoute from "../Components/ProtectedRoute"
 import NewArrivals from "../pages/NewArrivals";
+import CategoriesListingPage from "../pages/CategoriesListingPage";
 import BlogPage from "../pages/blog/BlogPage";
 import BlogPost from "../pages/blog/BlogPost";
 
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
         path: "/new-arrivals",
         element: <NewArrivals />
       },
+      // {
+      //   path: "/categories",
+      //   element: <CategoriesListingPage />
+      // },
       {
         path: "/categories/:category",
         element: <CategoryPage />
