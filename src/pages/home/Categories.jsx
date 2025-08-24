@@ -21,7 +21,7 @@ const Categories = () => {
       setError(null);
       
       const response = await API.request(
-        `${API.endpoints.publicCategories}?store=${currentStore.name}&topLevel=true&limit=8`
+                    `${API.endpoints.publicCategories}?store=${currentStore.slug}&topLevel=true&limit=8`
       );
       
       // Transform the API response to match our component structure

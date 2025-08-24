@@ -55,7 +55,7 @@ const CategoryPage = () => {
             setError(null);
             
             // First, get the category info to find the category ID
-            const categoriesResponse = await API.request(`${API.endpoints.publicCategories}?store=${currentStore.name}`);
+            const categoriesResponse = await API.request(`${API.endpoints.publicCategories}?store=${currentStore.slug}`);
             const categories = categoriesResponse.categories || categoriesResponse || [];
             const categoryData = categories.find(cat => cat.slug === category);
             
