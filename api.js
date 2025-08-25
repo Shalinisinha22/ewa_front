@@ -1,8 +1,8 @@
-// const BASE_API_URL = 'http://localhost:5000/api';
+const BASE_API_URL = 'https://ewa-back.vercel.app/api';
 // const IMG_URL = 'http://localhost:5000/uploads/';
-const BASE_API_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:5000/api' 
-  : 'https://ewa-back.vercel.app/api';
+// const BASE_API_URL = process.env.NODE_ENV === 'development' 
+//   ? 'http://localhost:5000/api' 
+//   : 'https://ewa-back.vercel.app/api';
 const IMG_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000'
   : 'https://ewa-back.vercel.app';
@@ -20,11 +20,11 @@ const API = {
         stores: `${BASE_API_URL}/stores`,
         users: `${BASE_API_URL}/users`,
         orders: `${BASE_API_URL}/orders`,
-        customerOrders: `${BASE_API_URL}/customer/auth/orders`,
-        customerOrderCreate: `${BASE_API_URL}/customer/auth/orders`,
-        customerOrderDetails: `${BASE_API_URL}/customer/auth/orders`,
+        customerOrders: `${BASE_API_URL}/auth/orders`,
+        customerOrderCreate: `${BASE_API_URL}/auth/orders`,
+        customerOrderDetails: `${BASE_API_URL}/auth/orders`,
         auth: `${BASE_API_URL}/auth`,
-        customerAuth: `${BASE_API_URL}/customer/auth`,
+        customerAuth: `${BASE_API_URL}/auth`,
         banners: `${BASE_API_URL}/banners`,
         publicBanners: `${BASE_API_URL}/banners/public`,
         shippingSettings: `${BASE_API_URL}/customers/store/shipping`,
@@ -62,6 +62,24 @@ const API = {
         // Add body for non-GET requests
         if (options.body && config.method !== 'GET') {
             config.body = options.body;
+        }
+
+        // Add store parameter for public endpoints that need store identification
+        if (endpoint.includes('/public') && !endpoint.includes('store=') && !endpoint.includes('storeId=')) {
+            const separator = endpoint.includes('?') ? '&' : '?';
+            
+            // Use store ID if available (for logged-in users)
+            if (storeId) {
+                endpoint = `${endpoint}${separator}storeId=${encodeURIComponent(storeId)}`;
+            }
+            // Use store name if available
+            else if (storeName) {
+                endpoint = `${endpoint}${separator}store=${encodeURIComponent(storeName)}`;
+            }
+            // Fallback to default store for public endpoints
+            else {
+                endpoint = `${endpoint}${separator}store=ewa-luxe`;
+            }
         }
 
         // Add store parameter for settings endpoints

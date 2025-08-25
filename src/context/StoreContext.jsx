@@ -42,15 +42,22 @@ export const StoreProvider = ({ children }) => {
         storeIdentifier = localStorage.getItem('currentStore');
       }
 
+      // Method 4: Use default store for development
+      if (!storeIdentifier) {
+        storeIdentifier = 'ewa-luxe'; // Default store slug
+      }
+
       if (storeIdentifier) {
         // Fetch store information using name or slug
         const response = await API.request(`${API.endpoints.stores}/public/${storeIdentifier}`);
         setCurrentStore(response.store);
         localStorage.setItem('currentStore', storeIdentifier);
+        localStorage.setItem('storeName', response.store.slug || response.store.name);
       } else {
-        // For development, try to get a default store
+        // Fallback to default store
         const response = await API.request(`${API.endpoints.stores}/public/default`);
         setCurrentStore(response.store);
+        localStorage.setItem('storeName', response.store.slug || response.store.name);
       }
     } catch (error) {
       console.error('Error identifying store:', error);

@@ -56,7 +56,7 @@ const ProductCards = ({products}) => {
 
   const getCartQuantity = (productId) => {
     const cartItem = cart.cartItems.find(
-      item => item.id === productId || item._id === productId
+      item => (item.id && item.id === productId) || (item._id && item._id === productId)
     );
     return cartItem ? cartItem.cartQuantity : 0;
   };
@@ -83,7 +83,7 @@ const ProductCards = ({products}) => {
 
   const isInCart = (productId) => {
     return cart.cartItems.some(item => 
-      (item.id === productId || item._id === productId)
+      (item.id && item.id === productId) || (item._id && item._id === productId)
     );
   };
 
@@ -100,13 +100,15 @@ const ProductCards = ({products}) => {
   };
 
   const handleAddToCart = (product) => {
+    const productId = product._id || product.id;
     const productToAdd = {
       ...product,
-      _id: product._id || product.id
+      _id: productId,
+      id: productId // Ensure both id and _id are set for consistency
     };
     
     dispatch(addToCart(productToAdd));
-    setShowNotification(product.id);
+    setShowNotification(productId);
     setTimeout(() => setShowNotification(null), 2000);
   };
 
@@ -212,7 +214,7 @@ const ProductCards = ({products}) => {
                   </button>
 
                   {/* Notification */}
-                  {showNotification === product.id && (
+                  {showNotification === productId && (
                     <div className="absolute top-2 left-2 bg-green-500 text-white px-3 py-1 rounded-md 
                       animate-fade-in-out shadow-lg text-sm">
                       Added to cart!
@@ -296,10 +298,15 @@ const ProductCards = ({products}) => {
                           className='flex-1 py-2 text-lg font-bold text-primary hover:bg-primary hover:text-white transition-colors duration-200 rounded-none'
                           style={{ borderRight: '1px solid #eee' }}
                           onClick={() => {
+                            const productToUpdate = {
+                              ...product,
+                              _id: productId,
+                              id: productId
+                            };
                             if (qty === 1) {
-                              dispatch(removeFromCart(product));
+                              dispatch(removeFromCart(productToUpdate));
                             } else {
-                              dispatch(decreaseCart(product));
+                              dispatch(decreaseCart(productToUpdate));
                             }
                           }}
                           aria-label='Decrease quantity'
