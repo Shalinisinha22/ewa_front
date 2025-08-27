@@ -3,11 +3,29 @@ import 'remixicon/fonts/remixicon.css';
 
 // Category icon mapping
 const categoryIcons = {
-  all: 'apps',
+  all: 'apps-2',
   jewellery: 'sparkling-2',
+  jewelry: 'sparkling-2',
   dress: 't-shirt',
+  dresses: 't-shirt',
+  clothing: 't-shirt',
   accessories: 'handbag',
+  bags: 'handbag',
   cosmetics: 'emotion-happy',
+  beauty: 'emotion-happy',
+  shoes: 'footprint',
+  footwear: 'footprint',
+  watches: 'time',
+  electronics: 'smartphone',
+  home: 'home-4',
+  sports: 'basketball',
+  books: 'book-open',
+  toys: 'gamepad',
+  men: 'user-3',
+  women: 'user-3',
+  mens: 'user-3',
+  womens: 'user-3',
+  default: 'price-tag-3'
 };
 // Color hex mapping
 const colorHex = {
@@ -23,94 +41,146 @@ const colorHex = {
   orange: '#fb923c',
 };
 
-const ShopFiltering = ({filters,filteredState,setFilteredState,clearFilters}) => {
+const ShopFiltering = ({filters,filteredState,setFilteredState,clearFilters, allCategories = [], currentCategory, onCategoryChange}) => {
+    
+    // Get category display name from API data
+    const getCategoryDisplayName = (categorySlug) => {
+        if (categorySlug === 'all') return 'All Categories';
+        const category = allCategories.find(cat => cat.slug === categorySlug);
+        return category?.name || categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1);
+    };
+
+    // Get category icon based on slug or name
+    const getCategoryIcon = (categorySlug) => {
+        const slug = categorySlug.toLowerCase();
+        return categoryIcons[slug] || categoryIcons.default;
+    };
   return (
     <div className='space-y-5 flex-shrink-0 w-64 bg-white rounded-xl shadow-md p-6 sticky top-6'>
         <h3 className='text-lg font-bold mb-4'>Filters</h3>
 
         {/* category */}
         <div className='flex flex-col space-y-2 mb-6'>
-            <h4 className='font-semibold text-sm mb-2'>Category</h4>
+            <h4 className='font-semibold text-sm mb-2 flex items-center gap-2'>
+                <i className="ri-apps-2-line text-primary"></i>
+                Categories
+            </h4>
             <hr />
             <div className='flex flex-col gap-2 mt-2'>
             {
-                filters.categories.map((category) => (
-                  <button
-                    key={category}
-                    type='button'
-                    onClick={() => setFilteredState({ ...filteredState, categories: category })}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition text-left
-                      ${filteredState.categories === category ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-100'}
-                    `}
-                  >
-                    <i className={`ri-${categoryIcons[category] || 'apps'}-line text-lg ${filteredState.categories === category ? 'text-primary' : 'text-gray-500'}`}></i>
-                    <span className={`capitalize text-sm ${filteredState.categories === category ? 'text-primary font-semibold' : 'text-gray-700'}`}>{category}</span>
+                                 filters.categories && filters.categories.length > 0 ? filters.categories.map((categorySlug) => (
+                   <button
+                     key={categorySlug}
+                     type='button'
+                     onClick={() => onCategoryChange ? onCategoryChange(categorySlug) : setFilteredState({ ...filteredState, categories: categorySlug })}
+                     className={`flex items-center gap-3 px-3 py-2 rounded-lg transition text-left
+                       ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-100'}
+                     `}
+                   >
+                    <i className={`ri-${getCategoryIcon(categorySlug)}-line text-lg ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary' : 'text-gray-500'}`}></i>
+                    <span className={`text-sm ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary font-semibold' : 'text-gray-700'}`}>
+                        {getCategoryDisplayName(categorySlug)}
+                    </span>
+                    {categorySlug === currentCategory && (
+                        <i className="ri-check-line text-xs text-green-500 ml-auto"></i>
+                    )}
                   </button>
-                ))
+                )) : (
+                    <div className="text-sm text-gray-500 px-3 py-2">
+                        Loading categories...
+                    </div>
+                )
             }
             </div>
         </div>
 
         {/* colors */}
         <div className='flex flex-col space-y-2 mb-6'>
-            <h4 className='font-semibold text-sm mb-2'>Colors</h4>
+            <h4 className='font-semibold text-sm mb-2 flex items-center gap-2'>
+                <i className="ri-palette-line text-primary"></i>
+                Colors
+            </h4>
             <hr />
             <div className='flex flex-wrap gap-2 mt-2'>
-            {
-                filters.colors.filter(color => color !== "all").map((color) => (
-                  <button
-                    key={color}
-                    type='button'
-                    onClick={() => setFilteredState({ ...filteredState, colors: color })}
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition
-                      ${filteredState.colors === color ? 'border-primary ring-2 ring-primary/30' : 'border-gray-200 hover:border-primary'}
-                    `}
-                    style={{ backgroundColor: colorHex[color] || color, borderColor: color === 'white' ? '#d1d5db' : undefined }}
-                    aria-label={color}
-                  >
-                    {filteredState.colors === color && (
-                      <i className="ri-check-line text-white text-lg"></i>
-                    )}
-                  </button>
-                ))
-            }
             {/* All Colors option */}
             <button
               type='button'
               onClick={() => setFilteredState({ ...filteredState, colors: 'all' })}
-              className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition
-                ${filteredState.colors === 'all' ? 'border-primary ring-2 ring-primary/30 bg-primary/10' : 'border-gray-200 hover:border-primary bg-gray-100'}
+              className={`w-10 h-8 rounded-lg border-2 flex items-center justify-center transition text-xs font-medium
+                ${filteredState.colors === 'all' ? 'border-primary ring-2 ring-primary/30 bg-primary text-white' : 'border-gray-200 hover:border-primary bg-gray-100 text-gray-600'}
               `}
               aria-label='All Colors'
             >
-              <i className="ri-palette-line text-lg text-gray-500"></i>
+              All
             </button>
+            {
+                filters.colors && filters.colors.filter(color => color !== "all").map((color) => {
+                    const colorValue = colorHex[color.toLowerCase()] || color;
+                    return (
+                        <button
+                            key={color}
+                            type='button'
+                            onClick={() => setFilteredState({ ...filteredState, colors: color })}
+                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition relative
+                              ${filteredState.colors === color ? 'border-primary ring-2 ring-primary/30' : 'border-gray-300 hover:border-primary'}
+                            `}
+                            style={{ 
+                                backgroundColor: colorValue, 
+                                borderColor: color === 'white' ? '#d1d5db' : undefined 
+                            }}
+                            aria-label={color}
+                            title={color.charAt(0).toUpperCase() + color.slice(1)}
+                        >
+                            {filteredState.colors === color && (
+                              <i className={`ri-check-line text-lg ${color === 'white' || color === 'yellow' ? 'text-gray-800' : 'text-white'}`}></i>
+                            )}
+                        </button>
+                    );
+                })
+            }
             </div>
         </div>
 
         {/* price */}
         <div className='flex flex-col space-y-2 mb-6'>
-            <h4 className='font-semibold text-sm mb-2'>Price range</h4>
+            <h4 className='font-semibold text-sm mb-2 flex items-center gap-2'>
+                <i className="ri-money-rupee-circle-line text-primary"></i>
+                Price Range
+            </h4>
             <hr />
             <div className='flex flex-col gap-2 mt-2'>
             {
-                filters.priceRanges.map((range) => (
+                filters.priceRanges && filters.priceRanges.map((range) => (
                   <button
                     key={range.label}
                     type='button'
-                    onClick={() => setFilteredState({ ...filteredState, priceRange: `${range.min} - ${range.max}` })}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition text-left
-                      ${filteredState.priceRange === `${range.min} - ${range.max}` ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-100'}
+                    onClick={() => setFilteredState({ ...filteredState, priceRange: range.label })}
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition text-left border
+                      ${filteredState.priceRange === range.label ? 'bg-primary/10 border-primary text-primary' : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'}
                     `}
                   >
-                    <span className={`capitalize text-sm ${filteredState.priceRange === `${range.min} - ${range.max}` ? 'text-primary font-semibold' : 'text-gray-700'}`}>{range.label}</span>
+                    <span className={`text-sm ${filteredState.priceRange === range.label ? 'font-semibold' : 'text-gray-700'}`}>
+                        {range.label}
+                    </span>
+                    {filteredState.priceRange === range.label && (
+                        <i className="ri-check-line text-primary"></i>
+                    )}
                   </button>
                 ))
             }
             </div>
         </div>
 
-        <button onClick={clearFilters} className='w-full mt-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-sm font-medium transition'>Clear All Filters</button>
+        {/* Clear Filters Button */}
+        <div className="pt-4 border-t border-gray-200">
+            <button 
+                onClick={clearFilters} 
+                className='w-full py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium transition flex items-center justify-center gap-2 text-gray-700 hover:text-gray-900'
+            >
+                <i className="ri-refresh-line"></i>
+                Clear All Filters
+            </button>
+        </div>
       
     </div>
   );

@@ -29,7 +29,8 @@ const API = {
         publicBanners: `${BASE_API_URL}/banners/public`,
         shippingSettings: `${BASE_API_URL}/customers/store/shipping`,
         paymentSettings: `${BASE_API_URL}/customers/store/payment`,
-        taxSettings: `${BASE_API_URL}/customers/store/tax`
+        taxSettings: `${BASE_API_URL}/customers/store/tax`,
+        payment: `${BASE_API_URL}/payment`
     },
 
     async request(endpoint, options = {}) {
