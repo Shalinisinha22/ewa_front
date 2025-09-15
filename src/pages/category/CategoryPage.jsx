@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';  
 import ProductCards from '../shop/ProductCards';
 import ShopFiltering from '../shop/ShopFiltering';
+import EmptyState from '../../Components/EmptyState';
 import { useStore } from '../../context/StoreContext';
 import API from '../../../api';
 
@@ -298,7 +299,23 @@ const CategoryPage = () => {
               </h3>
             </div>
             <div className="mt-6">
-              <ProductCards products={filteredProducts} />
+              {filteredProducts.length > 0 ? (
+                <ProductCards products={filteredProducts} />
+              ) : (
+                <EmptyState 
+                    type="category"
+                    message={`No products in ${categoryInfo?.name || category}`}
+                    subMessage={allCategoryProducts.length === 0 
+                        ? "This category is currently empty. Explore other categories." 
+                        : "No products match your current filters. Try adjusting your filters."
+                    }
+                    actionText={allCategoryProducts.length === 0 ? "View All Categories" : "Clear Filters"}
+                    onAction={allCategoryProducts.length === 0 
+                        ? () => navigate('/shop')
+                        : clearFilters
+                    }
+                />
+              )}
             </div>
           </div>
         </div>

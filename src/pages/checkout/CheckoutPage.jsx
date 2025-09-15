@@ -9,17 +9,6 @@ import { paymentService } from '../../services/paymentService';
 import { taxService } from '../../services/taxService';
 import toast from 'react-hot-toast';
 
-// Razorpay integration
-const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        script.onload = () => resolve(true);
-        script.onerror = () => resolve(false);
-        document.body.appendChild(script);
-    });
-};
-
 const CheckoutPage = () => {
     const cart = useSelector((state) => state.cart);
     const dispatch = useDispatch();
@@ -129,90 +118,6 @@ const CheckoutPage = () => {
         }
     };
 
-    const handleRazorpayPayment = async (orderData, totalAmount) => {
-        try {
-            // Load Razorpay script
-            const isScriptLoaded = await loadRazorpayScript();
-            if (!isScriptLoaded) {
-                toast.error('Failed to load payment gateway');
-                return;
-            }
-
-            // Get Razorpay gateway settings
-            const razorpayGateway = paymentService.getGatewayByName(paymentSettings, 'Razorpay');
-            if (!razorpayGateway || !razorpayGateway.isActive) {
-                toast.error('Razorpay payment not available');
-                return;
-            }
-
-            // Create Razorpay order on backend
-            const razorpayOrderResponse = await API.request(`${API.endpoints.payment}/razorpay/create-order`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    amount: Math.round(totalAmount * 100), // Convert to paise
-                    currency: 'INR',
-                    orderData: orderData
-                })
-            });
-
-            const options = {
-                key: razorpayGateway.credentials.keyId,
-                amount: Math.round(totalAmount * 100), // Amount in paise
-                currency: 'INR',
-                name: 'EWA Luxe',
-                description: `Order for ${cart.cartItems.length} items`,
-                order_id: razorpayOrderResponse.razorpayOrderId,
-                handler: async (response) => {
-                    try {
-                        // Verify payment on backend
-                        const verifyResponse = await API.request(`${API.endpoints.payment}/razorpay/verify`, {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                                orderData: orderData
-                            })
-                        });
-
-                        if (verifyResponse.success) {
-                            dispatch(clearCart());
-                            toast.success('Payment successful! Order placed.');
-                            navigate(`/order-confirmation/${verifyResponse.order._id}`);
-                        } else {
-                            toast.error('Payment verification failed');
-                        }
-                    } catch (error) {
-                        console.error('Payment verification error:', error);
-                        toast.error('Payment verification failed');
-                    }
-                },
-                prefill: {
-                    name: `${selectedAddress.firstName} ${selectedAddress.lastName}`,
-                    email: customer.email,
-                    contact: selectedAddress.phone
-                },
-                theme: {
-                    color: '#3B82F6'
-                },
-                modal: {
-                    ondismiss: () => {
-                        toast.error('Payment cancelled');
-                        setLoading(false);
-                    }
-                }
-            };
-
-            const razorpay = new window.Razorpay(options);
-            razorpay.open();
-
-        } catch (error) {
-            console.error('Razorpay payment error:', error);
-            toast.error('Payment failed. Please try again.');
-            setLoading(false);
-        }
-    };
-
     const handleCreateOrder = async () => {
         if (!selectedAddress) {
             toast.error('Please select a shipping address');
@@ -240,15 +145,13 @@ const CheckoutPage = () => {
                 shippingSettings
             );
             const taxAmount = taxService.calculateTax(subtotal, taxSettings);
-            const codCharges = selectedPaymentMethod.name === 'Cash on Delivery' ? 
-                paymentService.getCODCharges(paymentSettings) : 0;
-            const total = subtotal + shippingCost + taxAmount + codCharges;
+            const total = subtotal + shippingCost + taxAmount;
 
             const orderData = {
                 items: cart.cartItems.map(item => ({
                     product: item._id,
                     name: item.name,
-                    image: item.image || item.images?.[0],
+                    image: item.image,
                     price: item.price,
                     quantity: item.cartQuantity
                 })),
@@ -289,31 +192,24 @@ const CheckoutPage = () => {
                     tax: taxAmount,
                     shipping: shippingCost,
                     discount: 0,
-                    codCharges: codCharges,
                     total: total
                 },
                 status: 'pending'
             };
 
-            // Handle different payment methods
-            if (selectedPaymentMethod.name === 'Razorpay') {
-                await handleRazorpayPayment(orderData, total);
-            } else {
-                // Handle COD or other payment methods
-                const response = await API.request(API.endpoints.customerOrderCreate, {
-                    method: 'POST',
-                    body: JSON.stringify(orderData)
-                });
+            const response = await API.request(API.endpoints.customerOrderCreate, {
+                method: 'POST',
+                body: JSON.stringify(orderData)
+            });
 
-                dispatch(clearCart());
-                toast.success('Order placed successfully!');
-                navigate(`/order-confirmation/${response._id}`);
-                setLoading(false);
-            }
+            dispatch(clearCart());
+            toast.success('Order placed successfully!');
+            navigate(`/order-confirmation/${response._id}`);
             
         } catch (error) {
             toast.error('Failed to create order');
             console.error('Error creating order:', error);
+        } finally {
             setLoading(false);
         }
     };
@@ -524,91 +420,31 @@ const CheckoutPage = () => {
                         {/* Payment Method */}
                         {availablePayments.length > 0 && (
                             <div className="bg-white p-6 rounded-lg shadow">
-                                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                    <i className="ri-secure-payment-line"></i>
-                                    Payment Method
-                                </h2>
+                                <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
                                 <div className="space-y-3">
                                     {availablePayments.map((payment) => (
                                         <div
                                             key={payment.name}
-                                            className={`border p-4 rounded-lg cursor-pointer transition-all duration-200 ${
-                                                selectedPaymentMethod?.name === payment.name 
-                                                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20' 
-                                                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                            className={`border p-4 rounded cursor-pointer ${
+                                                selectedPaymentMethod?.name === payment.name ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                                             }`}
                                             onClick={() => setSelectedPaymentMethod(payment)}
                                         >
                                             <div className="flex justify-between items-center">
-                                                <div className="flex items-center gap-3">
-                                                    {payment.name === 'Razorpay' && (
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                                                                <i className="ri-bank-card-line text-white text-sm"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-medium text-gray-900">Razorpay</p>
-                                                                <p className="text-sm text-gray-600">Card, UPI, Net Banking & More</p>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    {payment.name === 'Cash on Delivery' && (
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-                                                                <i className="ri-hand-coin-line text-white text-sm"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-medium text-gray-900">Cash on Delivery</p>
-                                                                <p className="text-sm text-gray-600">Pay when you receive</p>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    {payment.name !== 'Razorpay' && payment.name !== 'Cash on Delivery' && (
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-8 h-8 bg-gray-600 rounded flex items-center justify-center">
-                                                                <i className="ri-wallet-line text-white text-sm"></i>
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-medium text-gray-900">{payment.name}</p>
-                                                                <p className="text-sm text-gray-600">{payment.description}</p>
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                <div>
+                                                    <p className="font-medium">{payment.name}</p>
+                                                    <p className="text-sm text-gray-600">{payment.description}</p>
                                                 </div>
-                                                <div className="text-right flex items-center gap-2">
+                                                <div className="text-right">
                                                     {payment.name === 'Cash on Delivery' && (
-                                                        <div className="text-sm">
-                                                            <span className="text-gray-500">+₹{paymentService.getCODCharges(paymentSettings).toFixed(2)}</span>
-                                                            <br />
-                                                            <span className="text-xs text-gray-400">charges</span>
-                                                        </div>
+                                                        <p className="text-sm text-gray-600">
+                                                            +₹{paymentService.getCODCharges(paymentSettings).toFixed(2)} charges
+                                                        </p>
                                                     )}
-                                                    {payment.name === 'Razorpay' && (
-                                                        <div className="flex gap-1">
-                                                            <img src="https://cdn.razorpay.com/static/assets/logo/payment.svg" alt="Payment methods" className="h-6" />
-                                                        </div>
-                                                    )}
-                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                                        selectedPaymentMethod?.name === payment.name 
-                                                            ? 'border-primary bg-primary' 
-                                                            : 'border-gray-300'
-                                                    }`}>
-                                                        {selectedPaymentMethod?.name === payment.name && (
-                                                            <i className="ri-check-line text-white text-xs"></i>
-                                                        )}
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
-                                </div>
-                                
-                                {/* Security Notice */}
-                                <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                                    <div className="flex items-center gap-2 text-sm text-green-800">
-                                        <i className="ri-shield-check-line"></i>
-                                        <span>Your payment information is secure and encrypted</span>
-                                    </div>
                                 </div>
                             </div>
                         )}
@@ -680,28 +516,9 @@ const CheckoutPage = () => {
                             <button
                                 onClick={handleCreateOrder}
                                 disabled={loading || !selectedAddress || !selectedShippingZone || !selectedPaymentMethod}
-                                className="w-full bg-primary text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                                className="w-full btn btn-primary mt-6"
                             >
-                                {loading ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                                        {selectedPaymentMethod?.name === 'Razorpay' ? 'Processing Payment...' : 'Creating Order...'}
-                                    </>
-                                ) : (
-                                    <>
-                                        {selectedPaymentMethod?.name === 'Razorpay' ? (
-                                            <>
-                                                <i className="ri-secure-payment-line"></i>
-                                                Pay Now
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="ri-shopping-bag-line"></i>
-                                                Place Order
-                                            </>
-                                        )}
-                                    </>
-                                )}
+                                {loading ? 'Creating Order...' : 'Place Order'}
                             </button>
                         </div>
                     </div>

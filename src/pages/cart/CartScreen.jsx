@@ -5,6 +5,7 @@ import { addToCart, decreaseCart, removeFromCart, getTotals } from '../../redux/
 import { useCustomer } from '../../context/CustomerContext';
 import { shippingService } from '../../services/shippingService';
 import { taxService } from '../../services/taxService';
+import EmptyState from '../../Components/EmptyState';
 
 const CartScreen = () => {
     const cart = useSelector((state) => state.cart);
@@ -94,22 +95,10 @@ const CartScreen = () => {
                 </div>
                 
             {cart.cartItems.length === 0 ? (
-                    <div className="text-center py-16">
-                        <div className="max-w-md mx-auto">
-                            <div className="mb-8">
-                                <i className="ri-shopping-cart-line text-6xl text-gray-300"></i>
-                            </div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-4">Your cart is empty</h3>
-                            <p className="text-gray-600 mb-8">Looks like you haven't added any items to your cart yet.</p>
-                            <Link 
-                                to="/shop" 
-                                className="inline-flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors font-medium"
-                            >
-                            <i className="ri-arrow-left-line"></i>
-                                <span>Continue Shopping</span>
-                        </Link>
-                    </div>
-                </div>
+                <EmptyState 
+                    type="cart"
+                    onAction={() => navigate('/shop')}
+                />
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Cart Items */}

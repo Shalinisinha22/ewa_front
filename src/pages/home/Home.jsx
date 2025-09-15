@@ -6,6 +6,7 @@ import TrendingProducts from '../shop/TrendingProducts';
 import PromoBanner from './PromoBanner';
 import BlogSection from './BlogSection.jsx';
 
+
 const Home = () => {
   return (
     <>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import ProductCards from '../shop/ProductCards';
+import EmptyState from '../../Components/EmptyState';
 import { useStore } from '../../context/StoreContext';
 import API from '../../../api';
 
@@ -329,11 +330,17 @@ const Search = () => {
                     {filteredProducts.length} Results for "{searchQuery}"
                 </h3>
                 {filteredProducts.length === 0 && (
-                    <div className="text-center py-12">
-                        <i className="ri-search-line text-6xl text-gray-300 mb-4"></i>
-                        <p className="text-gray-600 text-lg mb-2">No products found</p>
-                        <p className="text-gray-500">Try searching with different keywords</p>
-                    </div>
+                    <EmptyState 
+                        type="search"
+                        message={`No results found for "${searchQuery}"`}
+                        subMessage="Try searching with different keywords or check your spelling."
+                        actionText="Clear Search"
+                        onAction={() => {
+                            setSearchQuery('');
+                            setFilteredProducts([]);
+                            setSearchPerformed(false);
+                        }}
+                    />
                 )}
             </div>
         )}

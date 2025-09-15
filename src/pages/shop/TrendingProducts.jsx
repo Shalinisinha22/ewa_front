@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProductCards from "./ProductCards";
+import EmptyState from "../../Components/EmptyState";
 import { useStore } from "../../context/StoreContext";
 import API from "../../../api";
 
@@ -68,9 +69,10 @@ const TrendingProducts = () => {
                         {trendingProducts.length > 0 ? (
                             <ProductCards products={trendingProducts.slice(0, visibleProducts)} />
                         ) : (
-                            <div className="text-center py-12">
-                                <p className="text-gray-600">No trending products available at the moment.</p>
-                            </div>
+                            <EmptyState 
+                                type="trending"
+                                onAction={() => window.location.href = '/shop'}
+                            />
                         )}
                     </>
                 )}

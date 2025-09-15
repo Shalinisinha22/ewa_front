@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { getTotals } from '../redux/cartSlice'
 import { useStore } from '../context/StoreContext';
+import { useTheme } from '../hooks/useTheme';
 // import API from '../../../api'
 import API from '../../api'
 
@@ -10,6 +11,7 @@ const Navbar = () => {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const { currentStore } = useStore();
+  const { theme, logo, storeName } = useTheme();
   const user = localStorage.getItem('token'); // Get user token
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,7 +83,17 @@ const Navbar = () => {
 
 {/* logo */}
              <div className='nav__logo'>
-               <Link to="/">EWA<span>.</span></Link>
+               <Link to="/" className="flex items-center">
+                 {logo ? (
+                   <img 
+                     src={API.getImageUrl(logo)} 
+                     alt={storeName}
+                     className="h-8 w-auto"
+                   />
+                 ) : (
+                   <span>{storeName}<span className="text-primary">.</span></span>
+                 )}
+               </Link>
              </div>
 
 

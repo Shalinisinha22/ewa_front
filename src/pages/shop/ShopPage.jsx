@@ -3,6 +3,7 @@ import productsData from "../../data/products.json";
 import { useEffect } from "react";
 import ProductCard from "./ProductCards";
 import ShopFiltering from "./ShopFiltering";
+import EmptyState from "../../Components/EmptyState";
 const filters = {
   categories: ["all", "jewellery", "dress", "accessories", "cosmetics"],
   priceRanges: [
@@ -103,7 +104,17 @@ const ShopPage = () => {
               {products.length} Products Available
             </h3>
             <div className="mt-6">
-              <ProductCards products={products} />
+              {products.length > 0 ? (
+                <ProductCards products={products} />
+              ) : (
+                <EmptyState 
+                    type="products"
+                    message="No products found"
+                    subMessage="No products match your current filters. Try adjusting your filters or browse all products."
+                    actionText="Clear Filters"
+                    onAction={clearFilters}
+                />
+              )}
             </div>
           </div>
         </div>

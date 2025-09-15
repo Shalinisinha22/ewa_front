@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductCards from './shop/ProductCards';
 import ShopFiltering from './shop/ShopFiltering';
+import EmptyState from '../Components/EmptyState';
 import { useStore } from '../context/StoreContext';
 import API from '../../api';
 
@@ -276,15 +277,19 @@ const NewArrivals = () => {
                   {filteredProducts.length > 0 ? (
                     <ProductCards products={filteredProducts} />
                   ) : (
-                    <div className="text-center py-12">
-                      <p className="text-gray-600">No new arrivals match your current filters.</p>
-                      <button 
-                        onClick={clearFilters}
-                        className="mt-4 bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition-colors"
-                      >
-                        Clear Filters
-                      </button>
-                    </div>
+                    <EmptyState 
+                        type="new-arrivals"
+                        message="No new arrivals found"
+                        subMessage={newProducts.length === 0 
+                            ? "New products are added regularly. Check back soon!" 
+                            : "No new arrivals match your current filters. Try adjusting your filters."
+                        }
+                        actionText={newProducts.length === 0 ? "View All Products" : "Clear Filters"}
+                        onAction={newProducts.length === 0 
+                            ? () => window.location.href = '/shop'
+                            : clearFilters
+                        }
+                    />
                   )}
                 </div>
               </>

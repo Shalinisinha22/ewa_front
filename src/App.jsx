@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import { StoreProvider, useStore } from './context/StoreContext';
 import { CustomerProvider } from './context/CustomerContext';
+import { useTheme } from './hooks/useTheme';
 import Navbar from './Components/Navbar';
 import Footer from "./Components/Footer";
 
@@ -14,16 +15,8 @@ import './App.css';
 function AppContent() {
   const location = useLocation();
   const { currentStore } = useStore();
+  const { theme } = useTheme();
   const isAuthPage = ['/login', '/signup'].includes(location.pathname);
-
-  // Update document title based on current store
-  React.useEffect(() => {
-    if (currentStore) {
-      document.title = currentStore.name;
-    } else {
-      document.title = 'EWA Luxe';
-    }
-  }, [currentStore]);
 
   if (isAuthPage) {
     return (
@@ -45,7 +38,7 @@ function AppContent() {
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#363636',
+            background: theme.secondaryColor || '#363636',
             color: '#fff',
           },
           success: {
