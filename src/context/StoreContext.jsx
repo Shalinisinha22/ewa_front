@@ -106,7 +106,6 @@ export const StoreProvider = ({ children }) => {
       const response = await API.request(`${API.endpoints.stores}/public/default?store=${storeIdentifier}`);
       const store = response.store;
       
-      
       setCurrentStore(store);
       
       // Apply dynamic styling
@@ -119,14 +118,7 @@ export const StoreProvider = ({ children }) => {
       localStorage.setItem('storeName', storeIdentifier);
     } catch (error) {
       console.error('Error identifying store:', error);
-      if (error.status === 404) {
-        const errorData = error.message || {};
-        const availableStores = errorData.availableStores || [];
-        const storeList = availableStores.map(store => `${store.name} (slug: ${store.slug})`).join(', ');
-        setError(`Store '${storeIdentifier}' not found. Available stores: ${storeList || 'None'}`);
-      } else {
-        setError('Failed to identify store');
-      }
+      setError('Failed to identify store');
     } finally {
       setLoading(false);
     }
