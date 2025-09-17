@@ -94,7 +94,8 @@ export const CustomerProvider = ({ children }) => {
       
       localStorage.setItem('token', response.token);
       localStorage.setItem('storeId', response.store.id);
-      localStorage.setItem('storeName', response.store.name);
+      // Keep the original store identifier for API calls, not the display name
+      // localStorage.setItem('storeName', response.store.name); // Removed - use identifier instead
       localStorage.setItem('customer', JSON.stringify(response.customer));
       
       return response;
@@ -118,7 +119,8 @@ export const CustomerProvider = ({ children }) => {
       
       localStorage.setItem('token', response.token);
       localStorage.setItem('storeId', response.store.id);
-      localStorage.setItem('storeName', response.store.name);
+      // Keep the original store identifier for API calls, not the display name
+      // localStorage.setItem('storeName', response.store.name); // Removed - use identifier instead
       
       return response;
     } catch (err) {
@@ -136,7 +138,8 @@ export const CustomerProvider = ({ children }) => {
     
     localStorage.removeItem('token');
     localStorage.removeItem('storeId');
-    localStorage.removeItem('storeName');
+    // Keep storeName for store identification after logout
+    // localStorage.removeItem('storeName'); // Removed - keep store identifier
     localStorage.removeItem('customer');
   };
 

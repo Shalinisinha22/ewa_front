@@ -19,6 +19,7 @@ const API = {
         categories: `${BASE_API_URL}/categories`,
         publicCategories: `${BASE_API_URL}/categories/public`,
         stores: `${BASE_API_URL}/stores`,
+        publicStore: `${BASE_API_URL}/stores/public`,
         users: `${BASE_API_URL}/users`,
         orders: `${BASE_API_URL}/orders`,
         customerOrders: `${BASE_API_URL}/auth/orders`,
@@ -104,7 +105,9 @@ const API = {
             method: config.method,
             headers: config.headers,
             hasToken: !!token,
-            hasStoreId: !!storeId
+            hasStoreId: !!storeId,
+            storeName: storeName,
+            storeId: storeId
         });
 
         try {

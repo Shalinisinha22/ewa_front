@@ -75,17 +75,6 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
-  // Apply dynamic title (optional - can be disabled)
-  const applyTitle = (store, force = false) => {
-    // Only apply dynamic title if force is true or if title is still default
-    const currentTitle = document.title;
-    const isDefaultTitle = ['EWA Luxe', 'Zudio', 'Vite + React', 'React App'].includes(currentTitle);
-    
-    if (store?.name && (force || isDefaultTitle)) {
-      document.title = store.name;
-    }
-  };
-
   const identifyStore = async () => {
     try {
       setLoading(true);
@@ -116,6 +105,13 @@ export const StoreProvider = ({ children }) => {
       localStorage.setItem('currentStore', storeIdentifier);
       // Use the original store identifier from title, not the API response
       localStorage.setItem('storeName', storeIdentifier);
+      
+      // Debug logging
+      console.log('StoreContext: Set localStorage:', {
+        storeName: storeIdentifier,
+        currentStore: storeIdentifier,
+        title: currentTitle
+      });
     } catch (error) {
       console.error('Error identifying store:', error);
       setError('Failed to identify store');
@@ -132,10 +128,7 @@ export const StoreProvider = ({ children }) => {
     currentStore,
     loading,
     error,
-    identifyStore,
-    applyTheme,
-    applyFavicon,
-    applyTitle
+    identifyStore
   };
 
   return (

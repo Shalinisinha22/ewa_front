@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button onclick="testLocalAPI()">Test Local API</button>
+    <button onclick="testVercelAPI()">Test Vercel API</button>
+    <div id="results"></div>
+
+    <script>
+        async function testLocalAPI() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Testing Local API...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/stores/public/default?store=ewa-luxe', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                resultsDiv.innerHTML = `
+                    <h3>Local API Result:</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Store Name:</strong> ${data.store?.name || 'N/A'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <h3>Local API Error:</h3>
+                    <p style="color: red;">${error.message}</p>
+                `;
+            }
+        }
+
+        async function testVercelAPI() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Testing Vercel API...</p>';
+            
+            try {
+                const response = await fetch('https://ewa-back.vercel.app/api/stores/public/default?store=ewa-luxe', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                resultsDiv.innerHTML = `
+                    <h3>Vercel API Result:</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Store Name:</strong> ${data.store?.name || 'N/A'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <h3>Vercel API Error:</h3>
+                    <p style="color: red;">${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
