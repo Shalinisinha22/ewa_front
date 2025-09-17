@@ -105,13 +105,6 @@ export const StoreProvider = ({ children }) => {
       localStorage.setItem('currentStore', storeIdentifier);
       // Use the original store identifier from title, not the API response
       localStorage.setItem('storeName', storeIdentifier);
-      
-      // Debug logging
-      console.log('StoreContext: Set localStorage:', {
-        storeName: storeIdentifier,
-        currentStore: storeIdentifier,
-        title: currentTitle
-      });
     } catch (error) {
       console.error('Error identifying store:', error);
       setError('Failed to identify store');

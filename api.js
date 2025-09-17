@@ -29,6 +29,8 @@ const API = {
         customerAuth: `${BASE_API_URL}/auth`,
         banners: `${BASE_API_URL}/banners`,
         publicBanners: `${BASE_API_URL}/banners/public`,
+        promoBanners: `${BASE_API_URL}/promo-banners`,
+        publicPromoBanners: `${BASE_API_URL}/promo-banners/public`,
         shippingSettings: `${BASE_API_URL}/customers/store/shipping`,
         paymentSettings: `${BASE_API_URL}/customers/store/payment`,
         taxSettings: `${BASE_API_URL}/customers/store/tax`,

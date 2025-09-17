@@ -136,6 +136,7 @@ export const CustomerProvider = ({ children }) => {
     setStore(null);
     setError(null);
     
+    
     localStorage.removeItem('token');
     localStorage.removeItem('storeId');
     // Keep storeName for store identification after logout

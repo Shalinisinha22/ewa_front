@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, removeFromCart, decreaseCart } from '../../../redux/cartSlice';
 import { useCallback } from 'react';
 import ProductCards from '../ProductCards';
-import { FaTag, FaTshirt, FaRulerCombined, FaWarehouse, FaBarcode, FaGlobeAsia, FaShieldAlt, FaTruck, FaGift, FaListUl, FaPalette } from 'react-icons/fa';
+import { FaTag, FaGift } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../../context/StoreContext';
 import API from '../../../../api';
@@ -348,13 +348,13 @@ const SingleProduct = () => {
 
            {/* Additional Product Details */}
            <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
-             <div className="flex items-center"><FaTshirt className="mr-2 text-primary" /><span className="font-semibold">Brand:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Brand:</span></div>
              <div className="text-gray-700">{product.brand}</div>
 
-             <div className="flex items-center"><FaRulerCombined className="mr-2 text-primary" /><span className="font-semibold">Material:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Material:</span></div>
              <div className="text-gray-700">{product.material}</div>
 
-             <div className="flex items-center"><FaWarehouse className="mr-2 text-primary" /><span className="font-semibold">Size:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Size:</span></div>
              <div className="text-gray-700">
                {Array.isArray(product.attributes?.size) && product.attributes.size.length > 1 ? (
                  <select value={selectedSize} onChange={e => setSelectedSize(e.target.value)} className="border rounded px-2 py-1">
@@ -367,30 +367,30 @@ const SingleProduct = () => {
                )}
              </div>
 
-             <div className="flex items-center"><FaListUl className="mr-2 text-primary" /><span className="font-semibold">Care Instructions:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Care Instructions:</span></div>
              <div className="text-gray-700">{product.careInstructions}</div>
 
-             <div className="flex items-center"><FaWarehouse className="mr-2 text-primary" /><span className="font-semibold">Availability:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Availability:</span></div>
              <div className={getStockQuantity(product) > 0 ? 'text-green-600' : 'text-red-600'}>
                {getStockQuantity(product) > 0 ? 'In Stock' : 'Out of Stock'}
              </div>
 
-             <div className="flex items-center"><FaBarcode className="mr-2 text-primary" /><span className="font-semibold">SKU:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">SKU:</span></div>
              <div className="text-gray-700">{product.sku}</div>
 
-             <div className="flex items-center"><FaGlobeAsia className="mr-2 text-primary" /><span className="font-semibold">Country of Origin:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Country of Origin:</span></div>
              <div className="text-gray-700">{product.countryOfOrigin}</div>
 
-             <div className="flex items-center"><FaShieldAlt className="mr-2 text-primary" /><span className="font-semibold">Warranty:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Warranty:</span></div>
              <div className="text-gray-700">{product.warranty}</div>
 
-             <div className="flex items-center"><FaTruck className="mr-2 text-primary" /><span className="font-semibold">Delivery Info:</span></div>
+             <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Delivery Info:</span></div>
              <div className="text-gray-700">{product.deliveryInfo}</div>
 
              {/* Color Options */}
              {Array.isArray(product.attributes?.color) && product.attributes.color.length > 1 && (
                <>
-                 <div className="flex items-center"><FaPalette className="mr-2 text-primary" /><span className="font-semibold">Color:</span></div>
+                 <div className="flex items-center"><span className="mr-2 text-primary">•</span><span className="font-semibold">Color:</span></div>
                  <div className="flex items-center gap-2">
                    {product.attributes.color.map((clr, idx) => (
                      <button
@@ -422,7 +422,7 @@ const SingleProduct = () => {
            {/* Features */}
            {product.features && product.features.length > 0 && (
              <div className="mb-4">
-               <h4 className="font-semibold mb-1 flex items-center gap-1"><FaListUl className="text-primary" />Features:</h4>
+               <h4 className="font-semibold mb-1 flex items-center gap-1"><span className="text-primary">•</span>Features:</h4>
                <ul className="list-disc list-inside text-gray-700">
                  {product.features.map((feature, idx) => (
                    <li key={idx}>{feature}</li>
