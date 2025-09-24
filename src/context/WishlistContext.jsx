@@ -4,16 +4,8 @@ import { useCustomer } from './CustomerContext';
 import API from '../../api';
 import toast from 'react-hot-toast';
 
-// Force reload and debug - Updated at: 2025-01-24 22:15
-console.log('=== WISHLIST CONTEXT DEBUG ===');
-console.log('API object:', API);
-console.log('API methods available:', Object.keys(API));
-console.log('API.request type:', typeof API.request);
-console.log('API.post type:', typeof API.post);
-console.log('API.get type:', typeof API.get);
-console.log('API.delete type:', typeof API.delete);
-console.log('WishlistContext version: 2.3 - CACHE BUST - ' + new Date().toISOString());
-console.log('=== END DEBUG ===');
+// WishlistContext loaded - Updated: 2025-01-24 22:35
+console.log('WishlistContext version: 2.5 - Fixed wishlist URL to use correct backend');
 
 const WishlistContext = createContext();
 
@@ -93,7 +85,7 @@ export const WishlistProvider = ({ children }) => {
 
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const response = await API.request('/api/wishlist', {
+      const response = await API.request(API.endpoints.wishlist, {
         method: 'GET'
       });
       console.log('Wishlist API response:', response);
@@ -110,19 +102,11 @@ export const WishlistProvider = ({ children }) => {
 
   // Add to wishlist
   const addToWishlist = async (product) => {
-    console.log('=== ADD TO WISHLIST DEBUG ===');
-    console.log('Product:', product);
-    console.log('API object in addToWishlist:', API);
-    console.log('API.request available:', typeof API.request);
-    console.log('isAuthenticated:', isAuthenticated);
-    
     const wishlistItem = {
       productId: product._id || product.id,
       product: product,
       addedAt: new Date().toISOString()
     };
-
-    console.log('Wishlist item:', wishlistItem);
 
     if (!isAuthenticated) {
       console.log('User not authenticated, using local storage');
@@ -150,7 +134,7 @@ export const WishlistProvider = ({ children }) => {
         body: JSON.stringify({ productId: wishlistItem.productId })
       });
       
-      const response = await API.request('/api/wishlist', {
+      const response = await API.request(API.endpoints.wishlist, {
         method: 'POST',
         body: JSON.stringify({
           productId: wishlistItem.productId
@@ -183,7 +167,7 @@ export const WishlistProvider = ({ children }) => {
 
     // Remove from database for authenticated users
     try {
-      await API.request(`/api/wishlist/${productId}`, {
+      await API.request(`${API.endpoints.wishlist}/${productId}`, {
         method: 'DELETE'
       });
       dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: productId });
@@ -214,7 +198,7 @@ export const WishlistProvider = ({ children }) => {
       // Add each local wishlist item to database
       for (const item of localWishlist) {
         try {
-          await API.request('/api/wishlist', {
+          await API.request(API.endpoints.wishlist, {
             method: 'POST',
             body: JSON.stringify({
               productId: item.productId
@@ -251,7 +235,7 @@ export const WishlistProvider = ({ children }) => {
     }
 
     try {
-      await API.request('/api/wishlist', {
+      await API.request(API.endpoints.wishlist, {
         method: 'DELETE'
       });
       dispatch({ type: 'CLEAR_WISHLIST' });

@@ -1,7 +1,5 @@
-// Use environment variable or fallback to production URL
-const BASE_API_URL = (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
-  ? 'http://localhost:5000/api' 
-  : 'https://ewa-back.vercel.app/api';
+// Force production backend URL for now to fix wishlist issue
+const BASE_API_URL = 'https://ewa-back.vercel.app/api';
 
 const IMG_URL = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
   ? 'http://localhost:5000'
@@ -40,7 +38,8 @@ const API = {
         footer: `${BASE_API_URL}/footer`,
         publicFooter: `${BASE_API_URL}/footer/public`,
         invoices: `${BASE_API_URL}/invoices`,
-        invoiceDownload: `${BASE_API_URL}/invoices`
+        invoiceDownload: `${BASE_API_URL}/invoices`,
+        wishlist: `${BASE_API_URL}/wishlist`
     },
 
     async request(endpoint, options = {}) {
@@ -110,12 +109,14 @@ const API = {
         // Debug logging
         console.log('API Request:', {
             endpoint,
+            fullUrl: endpoint,
             method: config.method,
             headers: config.headers,
             hasToken: !!token,
             hasStoreId: !!storeId,
             storeName: storeName,
-            storeId: storeId
+            storeId: storeId,
+            BASE_API_URL: BASE_API_URL
         });
 
         try {
@@ -128,7 +129,18 @@ const API = {
                 headers: Object.fromEntries(response.headers.entries())
             });
 
-            const data = await response.json();
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let data;
+            
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                // If not JSON, get text response
+                const textResponse = await response.text();
+                console.error('Non-JSON response received:', textResponse);
+                throw new Error(`Server returned non-JSON response: ${response.status} ${response.statusText}`);
+            }
 
             if (!response.ok) {
                 // Include status code in error message for better error handling
