@@ -6,6 +6,7 @@ import { useCustomer } from '../../context/CustomerContext';
 import { shippingService } from '../../services/shippingService';
 import { taxService } from '../../services/taxService';
 import EmptyState from '../../Components/EmptyState';
+import BackButton from '../../Components/BackButton';
 
 const CartScreen = () => {
     const cart = useSelector((state) => state.cart);
@@ -90,6 +91,9 @@ const CartScreen = () => {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
+                    <div className="mb-4">
+                        <BackButton fallbackPath="/shop" text="Continue Shopping" />
+                    </div>
                     <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
                     <p className="text-gray-600 mt-2">Review your items and proceed to checkout</p>
                 </div>

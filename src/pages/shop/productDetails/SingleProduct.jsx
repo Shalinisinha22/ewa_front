@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Ratingstars from '../../../Components/Ratingstars';
+import BackButton from '../../../Components/BackButton';
+import WishlistButton from '../../../Components/WishlistButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, removeFromCart, decreaseCart } from '../../../redux/cartSlice';
 import { useCallback } from 'react';
@@ -238,6 +240,9 @@ const SingleProduct = () => {
     return (
         <>
      <section className="section__container bg-primary-light">
+        <div className="mb-4">
+          <BackButton fallbackPath="/shop" text="Back to Shop" />
+        </div>
         <h2 className="section__header capitalize">Shop Products</h2>
         <div className='section__subheader space-x-2' >
             <span>
@@ -498,6 +503,11 @@ const SingleProduct = () => {
                  </button>
                )
              )}
+           </div>
+
+           {/* Wishlist Button */}
+           <div className="mt-4">
+             <WishlistButton product={product} size="lg" showText={true} />
            </div>
 
                         {/* Add notification */}

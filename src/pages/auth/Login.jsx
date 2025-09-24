@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useCustomer } from '../../context/CustomerContext';
 import { getStoreNameFromTitle } from '../../utils/storeUtils';
+import BackButton from '../../Components/BackButton';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -39,6 +40,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
+          <div className="mb-4 flex justify-start">
+            <BackButton fallbackPath="/" text="Back to Home" />
+          </div>
           <h2 className="text-3xl font-bold">Login</h2>
           <p className="mt-2 text-gray-600">
             Welcome back! Please login to your account at <span className="font-semibold text-primary">{getStoreNameFromTitle()}</span>

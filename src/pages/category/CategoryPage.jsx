@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ProductCards from '../shop/ProductCards';
 import ShopFiltering from '../shop/ShopFiltering';
 import EmptyState from '../../Components/EmptyState';
+import BackButton from '../../Components/BackButton';
 import { useStore } from '../../context/StoreContext';
 import API from '../../../api';
 
@@ -272,6 +273,9 @@ const CategoryPage = () => {
   return (
     <>
      <section className='section__container bg-primary-light' >
+        <div className="mb-4">
+          <BackButton fallbackPath="/shop" text="Back to Shop" />
+        </div>
         <h2 className='section__header capitalize'>{categoryInfo?.name || category}</h2>
         <p className='section__subheader'>
             {categoryInfo?.description || `Explore our curated collection of ${categoryInfo?.name || category} items. Find the perfect pieces to enhance your style and express your personality.`}

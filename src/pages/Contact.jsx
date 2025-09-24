@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BackButton from '../Components/BackButton';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +20,9 @@ const Contact = () => {
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         {/* Contact Header */}
         <div className="text-center mb-12">
+          <div className="mb-4 flex justify-start">
+            <BackButton fallbackPath="/" text="Back to Home" />
+          </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
           <p className="text-lg text-gray-600">
             Have any questions? We'd love to hear from you.

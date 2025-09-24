@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import ProductCards from '../shop/ProductCards';
 import EmptyState from '../../Components/EmptyState';
+import BackButton from '../../Components/BackButton';
 import { useStore } from '../../context/StoreContext';
 import API from '../../../api';
 
@@ -186,6 +187,9 @@ const Search = () => {
   return (
     <>
          <section className='section__container bg-primary-light' >
+        <div className="mb-4">
+          <BackButton fallbackPath="/" text="Back to Home" />
+        </div>
         <h2 className='section__header capitalize'>Search Products</h2>
         <p className='section__subheader'>Find exactly what you're looking for from our extensive collection of fashion items and accessories.</p>
      </section>

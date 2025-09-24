@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Ratingstars from '../../Components/Ratingstars'
+import WishlistButton from '../../Components/WishlistButton'
 import { addToCart, removeFromCart, decreaseCart } from '../../redux/cartSlice';
 // import API from '../../../api';
 import API from '../../../api';
@@ -10,7 +11,6 @@ const ProductCards = ({products}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showNotification, setShowNotification] = useState(null);
-  const [wishlist, setWishlist] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
   const cart = useSelector((state) => state.cart);
 
@@ -87,17 +87,6 @@ const ProductCards = ({products}) => {
     );
   };
 
-  const isInWishlist = (productId) => {
-    return wishlist.includes(productId);
-  };
-
-  const handleWishlistToggle = (productId) => {
-    setWishlist(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
-  };
 
   const handleAddToCart = (product) => {
     const productId = product._id || product.id;
@@ -173,6 +162,11 @@ const ProductCards = ({products}) => {
                     </div>
                   )}
                   
+                  {/* Wishlist Button */}
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <WishlistButton product={product} size="sm" />
+                  </div>
+
                   {/* Navigation Arrows */}
                   {media.length > 1 && (
                     <>
@@ -200,18 +194,6 @@ const ProductCards = ({products}) => {
                       )}
                     </div>
                   )}
-
-                  {/* Wishlist Button */}
-                  <button 
-                    onClick={() => handleWishlistToggle(productId)}
-                    className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-300 ${
-                      isInWishlist(productId) 
-                        ? 'bg-red-500 text-white' 
-                        : 'bg-white text-gray-600 hover:bg-red-500 hover:text-white'
-                    }`}
-                  >
-                    <i className={`${isInWishlist(productId) ? 'ri-heart-fill' : 'ri-heart-line'}`}></i>
-                  </button>
 
                   {/* Notification */}
                   {showNotification === productId && (

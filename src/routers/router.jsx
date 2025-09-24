@@ -13,6 +13,7 @@ import TermsConditions from "../pages/TermsConditions";
 import ReturnPolicy from "../pages/ReturnPolicy";
 import ShippingPolicy from "../pages/ShippingPolicy";
 import Contact from "../pages/Contact";
+import DynamicPage from "../pages/DynamicPage";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import ProtectedRoute from "../Components/ProtectedRoute"
@@ -26,6 +27,7 @@ import Wishlist from "../pages/wishlist/Wishlist";
 import CheckoutPage from "../pages/checkout/CheckoutPage";
 import OrderConfirmationPage from "../pages/checkout/OrderConfirmationPage";
 import CustomerOrders from "../pages/profile/CustomerOrders";
+import OrderSuccessPage from "../pages/OrderSuccessPage";
 
 const router = createBrowserRouter([
   {
@@ -92,7 +94,21 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         )
       },
+      {
+        path: "/order-success/:orderId",
+        element: (
+          <ProtectedRoute>
+            <OrderSuccessPage />
+          </ProtectedRoute>
+        )
+      },
   
+      // Dynamic pages - these will fetch content from API
+      {
+        path: "/page/:pageType",
+        element: <DynamicPage />
+      },
+      // Legacy static page routes (keep for backward compatibility)
       {
         path: "/about",
         element: <AboutUs />

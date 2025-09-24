@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomer } from '../../context/CustomerContext';
+import { Download, Eye } from 'lucide-react';
+import BackButton from '../../Components/BackButton';
 import API from '../../../api';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [downloadingInvoices, setDownloadingInvoices] = useState({});
     const navigate = useNavigate();
     const { customer } = useCustomer();
 
@@ -28,6 +31,42 @@ const CustomerOrders = () => {
             console.error('Error fetching orders:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const downloadInvoice = async (orderId) => {
+        try {
+            setDownloadingInvoices(prev => ({ ...prev, [orderId]: true }));
+            
+            // Get existing invoice (should exist as it's generated automatically)
+            const invoice = await API.request(`${API.endpoints.invoices}/order/${orderId}`);
+
+            // Download the invoice
+            const response = await fetch(`${API.endpoints.invoiceDownload}/${invoice._id}/download`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `invoice-${invoice.invoiceNumber}.html`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } else {
+                throw new Error('Failed to download invoice');
+            }
+        } catch (error) {
+            console.error('Error downloading invoice:', error);
+            alert('Failed to download invoice. Please try again.');
+        } finally {
+            setDownloadingInvoices(prev => ({ ...prev, [orderId]: false }));
         }
     };
 
@@ -73,14 +112,9 @@ const CustomerOrders = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-4xl mx-auto px-4">
-                <div className="flex items-center mb-8">
-                    <button
-                        onClick={() => navigate('/profile')}
-                        className="mr-4 p-2 rounded-full hover:bg-gray-100"
-                    >
-                        <i className="ri-arrow-left-line text-xl"></i>
-                    </button>
-                    <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
+                <div className="mb-8">
+                    <BackButton fallbackPath="/profile" text="Back to Profile" />
+                    <h1 className="text-3xl font-bold text-gray-900 mt-4">My Orders</h1>
                 </div>
 
                 {orders.length === 0 ? (
@@ -119,9 +153,12 @@ const CustomerOrders = () => {
                                     {order.items.map((item, index) => (
                                         <div key={index} className="flex items-center space-x-4">
                                             <img
-                                                src={item.image}
+                                                src={item.image || 'https://via.placeholder.com/64x64?text=Product'}
                                                 alt={item.name}
-                                                className="w-16 h-16 object-cover rounded"
+                                                className="w-16 h-16 object-cover rounded border border-gray-200"
+                                                onError={(e) => {
+                                                    e.target.src = 'https://via.placeholder.com/64x64?text=Product';
+                                                }}
                                             />
                                             <div className="flex-1">
                                                 <h4 className="font-medium">{item.name}</h4>
@@ -131,6 +168,11 @@ const CustomerOrders = () => {
                                                 <p className="text-sm text-gray-600">
                                                     Price: ₹{item.price}
                                                 </p>
+                                                {item.variant && (
+                                                    <p className="text-sm text-gray-500">
+                                                        {item.variant.name}: {item.variant.value}
+                                                    </p>
+                                                )}
                                             </div>
                                             <div className="text-right">
                                                 <p className="font-medium">
@@ -159,6 +201,29 @@ const CustomerOrders = () => {
                                                 {order.payment.status === 'completed' ? 'Paid' : 'Pending'}
                                             </p>
                                         </div>
+                                    </div>
+                                    
+                                    {/* Action Buttons */}
+                                    <div className="flex justify-end space-x-3 mt-4">
+                                        <button
+                                            onClick={() => navigate(`/order-success/${order._id}`)}
+                                            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                        >
+                                            <Eye className="h-4 w-4 mr-2" />
+                                            View Details
+                                        </button>
+                                        <button
+                                            onClick={() => downloadInvoice(order._id)}
+                                            disabled={downloadingInvoices[order._id]}
+                                            className="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+                                        >
+                                            {downloadingInvoices[order._id] ? (
+                                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                                            ) : (
+                                                <Download className="h-4 w-4 mr-2" />
+                                            )}
+                                            {downloadingInvoices[order._id] ? 'Downloading...' : 'Download Invoice'}
+                                        </button>
                                     </div>
                                 </div>
 

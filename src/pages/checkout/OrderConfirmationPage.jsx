@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import BackButton from '../../Components/BackButton';
 import API from '../../../api';
 
 const OrderConfirmationPage = () => {
@@ -52,6 +53,9 @@ const OrderConfirmationPage = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-4xl mx-auto px-4">
+                <div className="mb-4">
+                    <BackButton fallbackPath="/" text="Back to Home" />
+                </div>
                 <div className="bg-white rounded-lg shadow p-8 text-center">
                     <div className="mb-6">
                         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">

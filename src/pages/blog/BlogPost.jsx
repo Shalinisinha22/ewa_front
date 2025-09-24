@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import blogs from '../../data/blogs.json';
+import BackButton from '../../Components/BackButton';
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -21,6 +22,9 @@ const BlogPost = () => {
     <>
       <section className="section__container bg-primary-light">
         <div className="text-center">
+          <div className="mb-4 flex justify-start">
+            <BackButton fallbackPath="/blog" text="Back to Blog" />
+          </div>
           <div className="inline-block bg-primary text-white px-4 py-2 rounded-full text-sm mb-4">
             {blog.subtitle}
           </div>

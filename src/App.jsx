@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import { StoreProvider, useStore } from './context/StoreContext';
 import { CustomerProvider } from './context/CustomerContext';
+import { WishlistProvider } from './context/WishlistContext';
 import { useTheme } from './hooks/useTheme';
 import Navbar from './Components/Navbar';
 import Footer from "./Components/Footer";
@@ -66,7 +67,9 @@ function App() {
     <Provider store={store}>
       <StoreProvider>
         <CustomerProvider>
-          <AppContent />
+          <WishlistProvider>
+            <AppContent />
+          </WishlistProvider>
         </CustomerProvider>
       </StoreProvider>
     </Provider>

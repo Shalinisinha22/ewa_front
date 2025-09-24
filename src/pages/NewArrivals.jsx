@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ProductCards from './shop/ProductCards';
 import ShopFiltering from './shop/ShopFiltering';
 import EmptyState from '../Components/EmptyState';
+import BackButton from '../Components/BackButton';
 import { useStore } from '../context/StoreContext';
 import API from '../../api';
 
@@ -230,6 +231,9 @@ const NewArrivals = () => {
   return (
     <>
       <section className="section__container bg-primary-light">
+        <div className="mb-4">
+          <BackButton fallbackPath="/" text="Back to Home" />
+        </div>
         <h2 className="section__header">New Arrivals</h2>
         <p className="section__subheader">
           Discover our latest collection featuring the newest trends and must-have pieces 

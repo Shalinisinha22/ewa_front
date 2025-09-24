@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useCustomer } from '../../context/CustomerContext';
 import { clearCart } from '../../redux/cartSlice';
+import BackButton from '../../Components/BackButton';
 import API from '../../../api';
 import { shippingService } from '../../services/shippingService';
 import { paymentService } from '../../services/paymentService';
@@ -204,7 +205,9 @@ const CheckoutPage = () => {
 
             dispatch(clearCart());
             toast.success('Order placed successfully!');
-            navigate(`/order-confirmation/${response._id}`);
+            
+            // Invoice will be generated automatically by the backend
+            navigate(`/order-success/${response._id}`);
             
         } catch (error) {
             toast.error('Failed to create order');
@@ -233,6 +236,9 @@ const CheckoutPage = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-6xl mx-auto px-4">
+                <div className="mb-4">
+                    <BackButton fallbackPath="/cart" text="Back to Cart" />
+                </div>
                 <h1 className="text-3xl font-bold mb-8">Checkout</h1>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

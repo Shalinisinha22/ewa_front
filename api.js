@@ -34,7 +34,14 @@ const API = {
         shippingSettings: `${BASE_API_URL}/customers/store/shipping`,
         paymentSettings: `${BASE_API_URL}/customers/store/payment`,
         taxSettings: `${BASE_API_URL}/customers/store/tax`,
-        payment: `${BASE_API_URL}/payment`
+        payment: `${BASE_API_URL}/payment`,
+        pages: `${BASE_API_URL}/pages`,
+        publicPages: `${BASE_API_URL}/pages/public`,
+        publicPageByType: `${BASE_API_URL}/pages/public/type`,
+        footer: `${BASE_API_URL}/footer`,
+        publicFooter: `${BASE_API_URL}/footer/public`,
+        invoices: `${BASE_API_URL}/invoices`,
+        invoiceDownload: `${BASE_API_URL}/invoices`
     },
 
     async request(endpoint, options = {}) {

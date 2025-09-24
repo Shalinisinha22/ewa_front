@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import ProductCard from "./ProductCards";
 import ShopFiltering from "./ShopFiltering";
 import EmptyState from "../../Components/EmptyState";
+import BackButton from "../../Components/BackButton";
 const filters = {
   categories: ["all", "jewellery", "dress", "accessories", "cosmetics"],
   priceRanges: [
@@ -82,6 +83,9 @@ const ShopPage = () => {
   return (
     <>
       <section className="section__container bg-primary-light">
+        <div className="mb-4">
+          <BackButton fallbackPath="/" text="Back to Home" />
+        </div>
         <h2 className="section__header capitalize">Shop Products</h2>
         <p className="section__subheader">
           Discover our complete collection of fashion items. Use filters to find exactly what you're looking for.
