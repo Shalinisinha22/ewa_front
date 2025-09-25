@@ -507,7 +507,12 @@ const SingleProduct = () => {
 
            {/* Wishlist Button */}
            <div className="mt-4">
-             <WishlistButton product={product} size="lg" showText={true} />
+             <WishlistButton 
+               product={product} 
+               className="w-full py-3 px-6 rounded-md font-medium bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+               showText={true}
+               iconSize="lg"
+             />
            </div>
 
                         {/* Add notification */}

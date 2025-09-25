@@ -1,7 +1,7 @@
 import React from 'react';
 import { useWishlist } from '../context/WishlistContext';
 
-const WishlistButton = ({ product, size = 'md', showText = false, className = '' }) => {
+const WishlistButton = ({ product, size = 'md', showText = false, className = '', iconSize = 'md' }) => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   const productId = product._id || product.id;
@@ -26,6 +26,17 @@ const WishlistButton = ({ product, size = 'md', showText = false, className = ''
         return 'w-12 h-12 text-lg';
       default:
         return 'w-10 h-10 text-base';
+    }
+  };
+
+  const getIconSizeClasses = () => {
+    switch (iconSize) {
+      case 'sm':
+        return 'text-sm';
+      case 'lg':
+        return 'text-xl';
+      default:
+        return 'text-base';
     }
   };
 
