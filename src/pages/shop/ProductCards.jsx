@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Ratingstars from '../../Components/Ratingstars'
 import WishlistButton from '../../Components/WishlistButton'
 import { addToCart, removeFromCart, decreaseCart } from '../../redux/cartSlice';
-// import API from '../../../api';
-import API from '../../../api';
+// import API from '../../api';
+import API from '../../api';
 
 const ProductCards = ({products}) => {
   const dispatch = useDispatch();

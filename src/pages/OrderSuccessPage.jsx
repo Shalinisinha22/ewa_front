@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, Download, Eye, Truck, Package, Clock, CreditCard } from 'lucide-react';
-import API from '../../api';
+import API from '../api';
 import LoadingSpinner from '../Components/LoadingSpinner';
 import BackButton from '../Components/BackButton';
 

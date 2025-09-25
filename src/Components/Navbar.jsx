@@ -6,7 +6,7 @@ import { useStore } from '../context/StoreContext';
 import { useCustomer } from '../context/CustomerContext';
 import { useTheme } from '../hooks/useTheme';
 // import API from '../../../api'
-import API from '../../api'
+import API from '../api'
 
 const Navbar = () => {
   const cart = useSelector((state) => state.cart);
@@ -43,17 +43,17 @@ const Navbar = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-              const response = await API.request(`${API.endpoints.publicCategories}?store=${currentStore.slug}`);
-      // Filter only active categories and sort by sortOrder
-      const activeCategories = (response.categories || response || [])
-        .filter(cat => cat.status === 'active')
+      const response = await API.request(`${API.endpoints.publicCategories}?store=${currentStore.slug}`);
+      // Filter only parent categories (no parent or level 0), active, and sort by sortOrder
+      const parentCategories = (response.categories || response || [])
+        .filter(cat => cat.status === 'active' && (!cat.parent || cat.level === 0))
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map(category => ({
           ...category,
           name: category.name || 'Unnamed Category',
           slug: category.slug || category.name?.toLowerCase().replace(/\s+/g, '-') || 'unnamed-category'
         }));
-      setCategories(activeCategories);
+      setCategories(parentCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
       // Fallback to default categories if API fails

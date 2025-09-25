@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
-import API from '../../../api';
+import API from '../../api';
 
 const PromoBanner = () => {
   const { currentStore } = useStore();

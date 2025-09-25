@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCustomer } from '../../context/CustomerContext';
 import { clearCart } from '../../redux/cartSlice';
 import BackButton from '../../Components/BackButton';
-import API from '../../../api';
+import API from '../../api';
 import { shippingService } from '../../services/shippingService';
 import { paymentService } from '../../services/paymentService';
 import { taxService } from '../../services/taxService';

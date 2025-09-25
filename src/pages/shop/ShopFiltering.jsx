@@ -41,7 +41,7 @@ const colorHex = {
   orange: '#fb923c',
 };
 
-const ShopFiltering = ({filters,filteredState,setFilteredState,clearFilters, allCategories = [], currentCategory, onCategoryChange}) => {
+const ShopFiltering = ({filters,filteredState,setFilteredState,clearFilters, allCategories = [], currentCategory, onCategoryChange, subcategories = []}) => {
     
     // Get category display name from API data
     const getCategoryDisplayName = (categorySlug) => {
@@ -68,24 +68,80 @@ const ShopFiltering = ({filters,filteredState,setFilteredState,clearFilters, all
             <hr />
             <div className='flex flex-col gap-2 mt-2'>
             {
-                                 filters.categories && filters.categories.length > 0 ? filters.categories.map((categorySlug) => (
-                   <button
-                     key={categorySlug}
-                     type='button'
-                     onClick={() => onCategoryChange ? onCategoryChange(categorySlug) : setFilteredState({ ...filteredState, categories: categorySlug })}
-                     className={`flex items-center gap-3 px-3 py-2 rounded-lg transition text-left
-                       ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-100'}
-                     `}
-                   >
-                    <i className={`ri-${getCategoryIcon(categorySlug)}-line text-lg ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary' : 'text-gray-500'}`}></i>
-                    <span className={`text-sm ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary font-semibold' : 'text-gray-700'}`}>
-                        {getCategoryDisplayName(categorySlug)}
-                    </span>
-                    {categorySlug === currentCategory && (
-                        <i className="ri-check-line text-xs text-green-500 ml-auto"></i>
-                    )}
-                  </button>
-                )) : (
+                filters.categories && filters.categories.length > 0 ? (
+                    <div className="space-y-1">
+                        {filters.categories.map((categorySlug) => {
+                            if (categorySlug === 'all') {
+                                return (
+                                    <button
+                                        key={categorySlug}
+                                        type='button'
+                                        onClick={() => onCategoryChange ? onCategoryChange(categorySlug) : setFilteredState({ ...filteredState, categories: categorySlug })}
+                                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition text-left w-full
+                                            ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-100'}
+                                        `}
+                                    >
+                                        <i className={`ri-${getCategoryIcon(categorySlug)}-line text-lg ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary' : 'text-gray-500'}`}></i>
+                                        <span className={`text-sm ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary font-semibold' : 'text-gray-700'}`}>
+                                            {getCategoryDisplayName(categorySlug)}
+                                        </span>
+                                        {categorySlug === currentCategory && (
+                                            <i className="ri-check-line text-xs text-green-500 ml-auto"></i>
+                                        )}
+                                    </button>
+                                );
+                            }
+
+                            // Find the category data from allCategories
+                            const categoryData = allCategories.find(cat => cat.slug === categorySlug);
+                            const categorySubcategories = subcategories.filter(sub => sub.parent && sub.parent._id === categoryData?._id);
+
+                            return (
+                                <div key={categorySlug} className="space-y-1">
+                                    {/* Main Category */}
+                                    <button
+                                        type='button'
+                                        onClick={() => onCategoryChange ? onCategoryChange(categorySlug) : setFilteredState({ ...filteredState, categories: categorySlug })}
+                                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition text-left w-full
+                                            ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-100'}
+                                        `}
+                                    >
+                                        <i className={`ri-${getCategoryIcon(categorySlug)}-line text-lg ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary' : 'text-gray-500'}`}></i>
+                                        <span className={`text-sm ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary font-semibold' : 'text-gray-700'}`}>
+                                            {getCategoryDisplayName(categorySlug)}
+                                        </span>
+                                        {categorySubcategories.length > 0 && (
+                                            <i className={`ri-arrow-down-s-line text-xs ml-auto ${(filteredState.categories === categorySlug || categorySlug === currentCategory) ? 'text-primary' : 'text-gray-400'}`}></i>
+                                        )}
+                                        {categorySlug === currentCategory && (
+                                            <i className="ri-check-line text-xs text-green-500"></i>
+                                        )}
+                                    </button>
+
+                                    {/* Subcategories under this category - only show if this is the current category */}
+                                    {currentCategory === categorySlug && categorySubcategories.map((subcategory) => (
+                                        <button
+                                            key={subcategory._id}
+                                            type='button'
+                                            onClick={() => onCategoryChange ? onCategoryChange(subcategory.slug) : setFilteredState({ ...filteredState, categories: subcategory.slug })}
+                                            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition text-left ml-6 border-l-2 border-gray-200 w-full
+                                                ${(filteredState.categories === subcategory.slug || subcategory.slug === currentCategory) ? 'bg-primary/10 border-l-primary' : 'hover:bg-gray-50'}
+                                            `}
+                                        >
+                                            <i className={`ri-${getCategoryIcon(subcategory.slug)}-line text-sm ${(filteredState.categories === subcategory.slug || subcategory.slug === currentCategory) ? 'text-primary' : 'text-gray-400'}`}></i>
+                                            <span className={`text-xs ${(filteredState.categories === subcategory.slug || subcategory.slug === currentCategory) ? 'text-primary font-semibold' : 'text-gray-600'}`}>
+                                                {subcategory.name}
+                                            </span>
+                                            {subcategory.slug === currentCategory && (
+                                                <i className="ri-check-line text-xs text-green-500 ml-auto"></i>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
                     <div className="text-sm text-gray-500 px-3 py-2">
                         Loading categories...
                     </div>

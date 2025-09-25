@@ -1,5 +1,6 @@
 // Force production backend URL for now to fix wishlist issue
 const BASE_API_URL = 'https://ewa-back.vercel.app/api';
+// const BASE_API_URL='http://localhost:5000/api'
 
 const IMG_URL = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
   ? 'http://localhost:5000'

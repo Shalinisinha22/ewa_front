@@ -67,3 +67,4 @@ const WishlistButton = ({ product, size = 'md', showText = false, className = ''
 
 export default WishlistButton;
 
+

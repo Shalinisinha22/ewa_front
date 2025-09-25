@@ -1,7 +1,7 @@
 // CACHE BUST - Force reload - Updated: 2025-01-24 22:20
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useCustomer } from './CustomerContext';
-import API from '../../api';
+import API from '../api';
 import toast from 'react-hot-toast';
 
 // WishlistContext loaded - Updated: 2025-01-24 22:35

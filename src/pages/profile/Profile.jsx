@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomer } from '../../context/CustomerContext';
 import BackButton from '../../Components/BackButton';
-import API from '../../../api';
+import API from '../../api';
 import toast from 'react-hot-toast';
 
 const Profile = () => {

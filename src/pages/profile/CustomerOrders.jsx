@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCustomer } from '../../context/CustomerContext';
 import { Download, Eye } from 'lucide-react';
 import BackButton from '../../Components/BackButton';
-import API from '../../../api';
+import API from '../../api';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);

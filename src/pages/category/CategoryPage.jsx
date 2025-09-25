@@ -5,7 +5,7 @@ import ShopFiltering from '../shop/ShopFiltering';
 import EmptyState from '../../Components/EmptyState';
 import BackButton from '../../Components/BackButton';
 import { useStore } from '../../context/StoreContext';
-import API from '../../../api';
+import API from '../../api';
 
 const CategoryPage = () => {
     const {category} = useParams();
@@ -17,6 +17,8 @@ const CategoryPage = () => {
     const [error, setError] = useState(null);
     const [categoryInfo, setCategoryInfo] = useState(null);
     const [allCategories, setAllCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+    const [allSubcategories, setAllSubcategories] = useState([]);
     const [dynamicFilters, setDynamicFilters] = useState({
         categories: [],
         priceRanges: [
@@ -90,12 +92,35 @@ const CategoryPage = () => {
             
             setCategoryInfo(processedCategoryData);
             
+            // Fetch subcategories for this category
+            const subcategoriesResponse = await API.request(`${API.endpoints.publicCategories}?store=${currentStore.slug || currentStore.name}&parent=${categoryData._id}&limit=50`);
+            const fetchedSubcategories = subcategoriesResponse.categories || subcategoriesResponse || [];
+            setSubcategories(fetchedSubcategories);
+            
+            // Also fetch all subcategories to handle products that might have subcategories from different parents
+            const allSubcategoriesResponse = await API.request(`${API.endpoints.publicCategories}?store=${currentStore.slug || currentStore.name}&limit=100`);
+            const allSubcategories = allSubcategoriesResponse.categories || allSubcategoriesResponse || [];
+            const allSubcategoriesOnly = allSubcategories.filter(cat => cat.parent || cat.level > 0);
+            setAllSubcategories(allSubcategoriesOnly);
+            
+            // Debug: Log subcategories to help troubleshoot
+            console.log('Fetched subcategories for category:', fetchedSubcategories);
+            console.log('All subcategories:', allSubcategoriesOnly);
+            
             // Fetch products for this category
             const productsResponse = await API.request(`${API.endpoints.publicProductsByCategory}/${categoryData._id}?store=${currentStore.slug || currentStore.name}&limit=100`);
             const products = productsResponse.products || productsResponse || [];
             
             // Process products to add image URLs and fix data structure
             const processedProducts = products.map(product => {
+                // Debug: Log product subcategory data
+                if (product.subcategory) {
+                    console.log('Product subcategory data:', {
+                        productName: product.name,
+                        subcategory: product.subcategory,
+                        subcategoryType: typeof product.subcategory
+                    });
+                }
                 const processArrayField = (field) => {
                     if (Array.isArray(field)) {
                         return field.map(item => {
@@ -146,10 +171,10 @@ const CategoryPage = () => {
     };
 
     const buildDynamicFilters = (categories, products) => {
-        // Build category filter from API categories
+        // Build category filter from API categories - only include parent categories
         const categoryFilters = ["all"];
         categories.forEach(cat => {
-            if (cat.slug && !categoryFilters.includes(cat.slug)) {
+            if (cat.slug && !categoryFilters.includes(cat.slug) && (!cat.parent || cat.level === 0)) {
                 categoryFilters.push(cat.slug);
             }
         });
@@ -193,10 +218,34 @@ const CategoryPage = () => {
 
     useEffect(() => {
         applyFilters();
-    }, [filteredState, allCategoryProducts]);
+    }, [filteredState, allCategoryProducts, subcategories, allSubcategories]);
 
     const applyFilters = () => {
         let filtered = [...allCategoryProducts];
+
+        // Filter by category/subcategory
+        if (filteredState.categories && filteredState.categories !== "all") {
+            // Check if it's a subcategory
+            const isSubcategory = subcategories.some(sub => sub.slug === filteredState.categories);
+            
+            if (isSubcategory) {
+                // Filter by subcategory
+                filtered = filtered.filter(product => {
+                    if (!product.subcategory) return false;
+                    
+                    // Handle both populated object and ID string
+                    if (typeof product.subcategory === 'object') {
+                        return product.subcategory.slug === filteredState.categories;
+                    } else if (typeof product.subcategory === 'string') {
+                        // If subcategory is just an ID, find the matching subcategory from our allSubcategories list
+                        const matchingSubcategory = allSubcategories.find(sub => sub._id === product.subcategory);
+                        return matchingSubcategory && matchingSubcategory.slug === filteredState.categories;
+                    }
+                    return false;
+                });
+            }
+            // If it's not a subcategory, it's the main category, so show all products in this category
+        }
 
         // Filter by price range
         if (filteredState.priceRange !== "") {
@@ -231,12 +280,37 @@ const CategoryPage = () => {
         if (newCategorySlug === "all") {
             // Navigate to shop page or show all products
             navigate('/shop');
-        } else if (newCategorySlug !== category) {
-            // Navigate to the new category page
-            navigate(`/categories/${newCategorySlug}`);
         } else {
-            // Same category, just update the filter state
-            setFilteredState({ ...filteredState, categories: newCategorySlug });
+            // Check if it's a subcategory of the current category
+            const isSubcategory = subcategories.some(sub => sub.slug === newCategorySlug);
+            
+            if (isSubcategory) {
+                // Filter products by subcategory
+                setFilteredState({ ...filteredState, categories: newCategorySlug });
+                
+                // Filter products by the selected subcategory
+                const subcategoryProducts = allCategoryProducts.filter(product => {
+                    if (!product.subcategory) return false;
+                    
+                    // Handle both populated object and ID string
+                    if (typeof product.subcategory === 'object') {
+                        return product.subcategory.slug === newCategorySlug;
+                    } else if (typeof product.subcategory === 'string') {
+                        // If subcategory is just an ID, find the matching subcategory from our allSubcategories list
+                        const matchingSubcategory = allSubcategories.find(sub => sub._id === product.subcategory);
+                        return matchingSubcategory && matchingSubcategory.slug === newCategorySlug;
+                    }
+                    return false;
+                });
+                setFilteredProducts(subcategoryProducts);
+            } else if (newCategorySlug !== category) {
+                // Navigate to the new category page
+                navigate(`/categories/${newCategorySlug}`);
+            } else {
+                // Same category, reset to show all products in this category
+                setFilteredState({ ...filteredState, categories: newCategorySlug });
+                setFilteredProducts(allCategoryProducts);
+            }
         }
     };
 
@@ -276,10 +350,48 @@ const CategoryPage = () => {
         <div className="mb-4">
           <BackButton fallbackPath="/shop" text="Back to Shop" />
         </div>
+        
+        {/* Breadcrumb Navigation */}
+        {categoryInfo?.parent && (
+            <nav className="flex mb-4" aria-label="Breadcrumb">
+                <ol className="inline-flex items-center space-x-1 md:space-x-3">
+                    <li className="inline-flex items-center">
+                        <button 
+                            onClick={() => navigate('/shop')}
+                            className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary"
+                        >
+                            <i className="ri-home-line mr-2"></i>
+                            Shop
+                        </button>
+                    </li>
+                    <li>
+                        <div className="flex items-center">
+                            <i className="ri-arrow-right-s-line text-gray-400 mx-1"></i>
+                            <button 
+                                onClick={() => navigate(`/categories/${categoryInfo.parent.slug}`)}
+                                className="ml-1 text-sm font-medium text-gray-700 hover:text-primary"
+                            >
+                                {categoryInfo.parent.name}
+                            </button>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div className="flex items-center">
+                            <i className="ri-arrow-right-s-line text-gray-400 mx-1"></i>
+                            <span className="ml-1 text-sm font-medium text-gray-500">
+                                {categoryInfo?.name || category}
+                            </span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+        )}
+        
         <h2 className='section__header capitalize'>{categoryInfo?.name || category}</h2>
         <p className='section__subheader'>
             {categoryInfo?.description || `Explore our curated collection of ${categoryInfo?.name || category} items. Find the perfect pieces to enhance your style and express your personality.`}
         </p>
+        
      </section>
 
      <div className='section__container'>
@@ -293,6 +405,7 @@ const CategoryPage = () => {
             allCategories={allCategories}
             currentCategory={category}
             onCategoryChange={handleCategoryFilterChange}
+            subcategories={subcategories}
           />
 
           {/* Right Products Section */}

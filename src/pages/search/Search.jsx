@@ -3,7 +3,7 @@ import ProductCards from '../shop/ProductCards';
 import EmptyState from '../../Components/EmptyState';
 import BackButton from '../../Components/BackButton';
 import { useStore } from '../../context/StoreContext';
-import API from '../../../api';
+import API from '../../api';
 
 // Debounce utility function
 const debounce = (func, delay) => {

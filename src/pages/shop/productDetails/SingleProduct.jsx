@@ -11,7 +11,7 @@ import ProductCards from '../ProductCards';
 import { FaTag, FaGift } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../../context/StoreContext';
-import API from '../../../../api';
+import API from '../../../api';
 
 const SingleProduct = () => {
     const { id } = useParams();

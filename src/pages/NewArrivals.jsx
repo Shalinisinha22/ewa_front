@@ -4,7 +4,7 @@ import ShopFiltering from './shop/ShopFiltering';
 import EmptyState from '../Components/EmptyState';
 import BackButton from '../Components/BackButton';
 import { useStore } from '../context/StoreContext';
-import API from '../../api';
+import API from '../api';
 
 const NewArrivals = () => {
   const { currentStore } = useStore();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import API from '../../api';
+import API from '../api';
 import LoadingSpinner from '../Components/LoadingSpinner';
 import { getCurrentStoreName, getCurrentStoreId } from '../utils/storeUtils';
 
