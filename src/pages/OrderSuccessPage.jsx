@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, Download, Eye, Truck, Package, Clock, CreditCard } from 'lucide-react';
+import { CheckCircle, Download, Eye, Truck, Package, Clock, CreditCard, X, RotateCcw } from 'lucide-react';
+import toast from 'react-hot-toast';
 import API from '../api';
 import LoadingSpinner from '../Components/LoadingSpinner';
 import BackButton from '../Components/BackButton';
@@ -13,6 +14,19 @@ const OrderSuccessPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+  const [cancellingOrder, setCancellingOrder] = useState(false);
+  const [requestingReturn, setRequestingReturn] = useState(false);
+  const [returnReason, setReturnReason] = useState('');
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnRequestSubmitted, setReturnRequestSubmitted] = useState(false);
+  const [bankDetails, setBankDetails] = useState({
+    accountHolderName: '',
+    bankName: '',
+    accountNumber: '',
+    ifscCode: '',
+    upiId: '',
+    branchAddress: ''
+  });
 
   useEffect(() => {
     if (orderId) {
@@ -115,11 +129,86 @@ const OrderSuccessPage = () => {
       }
     } catch (err) {
       console.error('Error downloading invoice:', err);
-      alert(`Failed to download invoice: ${err.message}`);
+      toast.error(`Failed to download invoice: ${err.message}`);
     } finally {
       setDownloadingInvoice(false);
     }
   };
+
+  const cancelOrder = async () => {
+    if (!order) return;
+    
+    if (!window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setCancellingOrder(true);
+      
+      await API.request(`${API.endpoints.customerOrderCancel}/${orderId}/cancel`, {
+        method: 'PUT',
+        body: JSON.stringify({})
+      });
+
+      // Refresh order data
+      await fetchOrderDetails();
+      toast.success('Order cancelled successfully');
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      toast.error(`Failed to cancel order: ${error.message || 'Please try again.'}`);
+    } finally {
+      setCancellingOrder(false);
+    }
+  };
+
+  const showReturnRequestForm = () => {
+    setShowReturnModal(true);
+  };
+
+  const requestReturn = async () => {
+    if (!returnReason.trim()) {
+      toast.error('Please provide a reason for the return request.');
+      return;
+    }
+
+    // Validate bank details
+    if (!bankDetails.accountHolderName || !bankDetails.bankName || !bankDetails.accountNumber || !bankDetails.ifscCode) {
+      toast.error('Please provide all required bank details.');
+      return;
+    }
+
+    try {
+      setRequestingReturn(true);
+      
+      await API.request(`${API.endpoints.customerOrderReturn}/${orderId}/return`, {
+        method: 'POST',
+        body: JSON.stringify({
+          reason: returnReason,
+          notes: '',
+          bankDetails: bankDetails
+        })
+      });
+
+      setShowReturnModal(false);
+      setReturnReason('');
+      setBankDetails({
+        accountHolderName: '',
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        upiId: '',
+        branchAddress: ''
+      });
+      setReturnRequestSubmitted(true);
+      toast.success('Return request submitted successfully. Our support team will review your request.');
+    } catch (error) {
+      console.error('Error requesting return:', error);
+      toast.error(`Failed to submit return request: ${error.message || 'Please try again.'}`);
+    } finally {
+      setRequestingReturn(false);
+    }
+  };
+
 
   const getStatusColor = (status) => {
     const colors = {
@@ -129,7 +218,9 @@ const OrderSuccessPage = () => {
       shipped: 'text-indigo-600 bg-indigo-100',
       delivered: 'text-green-600 bg-green-100',
       cancelled: 'text-red-600 bg-red-100',
-      refunded: 'text-gray-600 bg-gray-100'
+      refunded: 'text-gray-600 bg-gray-100',
+      return_requested: 'text-orange-600 bg-orange-100',
+      refund_completed: 'text-green-600 bg-green-100'
     };
     return colors[status] || 'text-gray-600 bg-gray-100';
   };
@@ -170,6 +261,15 @@ const OrderSuccessPage = () => {
       };
     });
   };
+
+  const canCancelOrder = () => {
+    return order && (order.status === 'pending' || order.status === 'confirmed' || order.status === 'processing');
+  };
+
+  const canRequestReturn = () => {
+    return order && order.status === 'delivered' && !returnRequestSubmitted;
+  };
+
 
   if (loading) {
     return (
@@ -316,7 +416,9 @@ const OrderSuccessPage = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      {order.status === 'refund_completed' 
+                        ? 'Refund Completed'
+                        : order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -438,10 +540,208 @@ const OrderSuccessPage = () => {
               >
                 Continue Shopping
               </button>
+              
+              {/* Cancel Order Button */}
+              {canCancelOrder() && (
+                <button
+                  onClick={cancelOrder}
+                  disabled={cancellingOrder}
+                  className="inline-flex items-center px-6 py-3 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+                >
+                  {cancellingOrder ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-500 border-t-transparent mr-2" />
+                  ) : (
+                    <X className="h-4 w-4 mr-2" />
+                  )}
+                  {cancellingOrder ? 'Cancelling...' : 'Cancel Order'}
+                </button>
+              )}
+
+              {/* Return Request Button */}
+              {canRequestReturn() && (
+                <button
+                  onClick={showReturnRequestForm}
+                  className="inline-flex items-center px-6 py-3 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Request Return
+                </button>
+              )}
+
+              {/* Status Messages if already submitted */}
+              {returnRequestSubmitted && (
+                <div className="inline-flex items-center px-4 py-2 rounded-md bg-blue-100 text-blue-800 text-sm">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Return request submitted - Under review
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+
+      {/* Return Request Modal */}
+      {showReturnModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center">
+                <RotateCcw className="h-6 w-6 text-blue-600 mr-2" />
+                <h3 className="text-lg font-medium text-gray-900">
+                  Request Return
+                </h3>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Return Reason *
+                  </label>
+                  <textarea
+                    value={returnReason}
+                    onChange={(e) => setReturnReason(e.target.value)}
+                    placeholder="Please describe why you want to return this order..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500"
+                    rows={4}
+                    disabled={requestingReturn}
+                  />
+                </div>
+
+                {/* Bank Details Section */}
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <h4 className="text-md font-medium text-gray-900 mb-4">Bank Details for Refund Processing</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Account Holder Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={bankDetails.accountHolderName}
+                        onChange={(e) => setBankDetails(prev => ({ ...prev, accountHolderName: e.target.value }))}
+                        placeholder="Enter full name as per bank records"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Bank Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={bankDetails.bankName}
+                        onChange={(e) => setBankDetails(prev => ({ ...prev, bankName: e.target.value }))}
+                        placeholder="Enter bank name"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Account Number *
+                      </label>
+                      <input
+                        type="text"
+                        value={bankDetails.accountNumber}
+                        onChange={(e) => setBankDetails(prev => ({ ...prev, accountNumber: e.target.value }))}
+                        placeholder="Enter account number"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        IFSC Code *
+                      </label>
+                      <input
+                        type="text"
+                        value={bankDetails.ifscCode}
+                        onChange={(e) => setBankDetails(prev => ({ ...prev, ifscCode: e.target.value.toUpperCase() }))}
+                        placeholder="Enter IFSC code"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        UPI ID (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={bankDetails.upiId}
+                        onChange={(e) => setBankDetails(prev => ({ ...prev, upiId: e.target.value }))}
+                        placeholder="Enter UPI ID for faster processing"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Branch Address (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={bankDetails.branchAddress}
+                        onChange={(e) => setBankDetails(prev => ({ ...prev, branchAddress: e.target.value }))}
+                        placeholder="Enter branch address"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowReturnModal(false);
+                    setReturnReason('');
+                    setBankDetails({
+                      accountHolderName: '',
+                      bankName: '',
+                      accountNumber: '',
+                      ifscCode: '',
+                      upiId: '',
+                      branchAddress: ''
+                    });
+                  }}
+                  disabled={requestingReturn}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={requestReturn}
+                  disabled={requestingReturn || !returnReason.trim() || !bankDetails.accountHolderName || !bankDetails.bankName || !bankDetails.accountNumber || !bankDetails.ifscCode}
+                  className={`px-4 py-2 rounded-md text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50
+                      ${requestingReturn || !returnReason.trim() || !bankDetails.accountHolderName || !bankDetails.bankName || !bankDetails.accountNumber || !bankDetails.ifscCode
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-blue-600 hover:bg-blue-700'
+                      }`}
+                >
+                  {requestingReturn ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      Submitting...
+                    </div>
+                  ) : (
+                    'Submit Return Request'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -28,6 +28,20 @@ const Profile = () => {
     phone: '',
     isDefault: false
   });
+
+  // Bank Details State
+  const [showBankForm, setShowBankForm] = useState(false);
+  const [editingBankIndex, setEditingBankIndex] = useState(null);
+  const [newBankDetails, setNewBankDetails] = useState({
+    accountHolderName: '',
+    bankName: '',
+    accountNumber: '',
+    ifscCode: '',
+    upiId: '',
+    branchAddress: '',
+    accountType: 'savings',
+    isDefault: false
+  });
   const navigate = useNavigate();
   const { customer, store, loading, error, updateProfile, logout } = useCustomer();
 
@@ -159,6 +173,91 @@ const Profile = () => {
     } catch (err) {
       setLocalError(err.message || 'Failed to update address');
       toast.error('Failed to update address');
+    }
+  };
+
+  // Bank Details Management
+  const handleAddBankDetail = async (e) => {
+    e.preventDefault();
+    setLocalError('');
+
+    try {
+      const updatedBankDetails = [...(customer.bankDetails || []), newBankDetails];
+      await updateProfile({ bankDetails: updatedBankDetails });
+      setShowBankForm(false);
+      setNewBankDetails({
+        accountHolderName: '',
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        upiId: '',
+        branchAddress: '',
+        accountType: 'savings',
+        isDefault: false
+      });
+      toast.success('Bank details added successfully!');
+    } catch (err) {
+      setLocalError(err.message || 'Failed to add bank details');
+      toast.error('Failed to add bank details');
+    }
+  };
+
+  const handleDeleteBankDetail = async (index) => {
+    try {
+      const updatedBankDetails = customer.bankDetails.filter((_, i) => i !== index);
+      await updateProfile({ bankDetails: updatedBankDetails });
+      toast.success('Bank details deleted successfully!');
+    } catch (err) {
+      setLocalError(err.message || 'Failed to delete bank details');
+      toast.error('Failed to delete bank details');
+    }
+  };
+
+  const handleSetDefaultBankDetail = async (index) => {
+    try {
+      const updatedBankDetails = customer.bankDetails.map((bank, i) => ({
+        ...bank,
+        isDefault: i === index
+      }));
+      await updateProfile({ bankDetails: updatedBankDetails });
+      toast.success('Default bank details updated!');
+    } catch (err) {
+      setLocalError(err.message || 'Failed to set default bank details');
+      toast.error('Failed to set default bank details');
+    }
+  };
+
+  const handleEditBankDetail = (index) => {
+    const bankDetail = customer.bankDetails[index];
+    setNewBankDetails({ ...bankDetail });
+    setEditingBankIndex(index);
+    setShowBankForm(true);
+  };
+
+  const handleUpdateBankDetail = async (e) => {
+    e.preventDefault();
+    setLocalError('');
+
+    try {
+      const updatedBankDetails = [...customer.bankDetails];
+      updatedBankDetails[editingBankIndex] = newBankDetails;
+      await updateProfile({ bankDetails: updatedBankDetails });
+      setShowBankForm(false);
+      setEditingBankIndex(null);
+      setNewBankDetails({
+        accountHolderName: '',
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        upiId: '',
+        branchAddress: '',
+        accountType: 'savings',
+        isDefault: false
+      });
+      toast.success('Bank details updated successfully!');
+    } catch (err) {
+      setLocalError(err.message || 'Failed to update bank details');
+      toast.error('Failed to update bank details');
     }
   };
 
@@ -670,6 +769,267 @@ const Profile = () => {
                   <p className="text-gray-500 text-sm mt-2">Add your first address to get started.</p>
                 </div>
               )}
+              </div>
+            </div>
+
+            {/* Bank Details Management */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <i className="ri-bank-line mr-2 text-primary"></i>
+                    Bank Details for Refunds
+                  </h2>
+                  <button
+                    onClick={() => {
+                      if (showBankForm) {
+                        setShowBankForm(false);
+                        setEditingBankIndex(null);
+                        setNewBankDetails({
+                          accountHolderName: '',
+                          bankName: '',
+                          accountNumber: '',
+                          ifscCode: '',
+                          upiId: '',
+                          branchAddress: '',
+                          accountType: 'savings',
+                          isDefault: false
+                        });
+                      } else {
+                        setEditingBankIndex(null);
+                        setShowBankForm(true);
+                      }
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors shadow-sm"
+                  >
+                    <i className="ri-add-line mr-1"></i>
+                    {showBankForm ? 'Cancel' : 'Add Bank Details'}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                {showBankForm && (
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 className="text-base font-semibold text-gray-900 mb-4">
+                      {editingBankIndex !== null ? 'Edit Bank Details' : 'Add New Bank Details'}
+                    </h3>
+                    <form onSubmit={editingBankIndex !== null ? handleUpdateBankDetail : handleAddBankDetail} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">Account Holder Name</label>
+                          <input
+                            type="text"
+                            value={newBankDetails.accountHolderName}
+                            onChange={(e) => setNewBankDetails({...newBankDetails, accountHolderName: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">Bank Name</label>
+                          <input
+                            type="text"
+                            value={newBankDetails.bankName}
+                            onChange={(e) => setNewBankDetails({...newBankDetails, bankName: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">Account Number</label>
+                          <input
+                            type="text"
+                            value={newBankDetails.accountNumber}
+                            onChange={(e) => setNewBankDetails({...newBankDetails, accountNumber: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">IFSC Code</label>
+                          <input
+                            type="text"
+                            value={newBankDetails.ifscCode}
+                            onChange={(e) => setNewBankDetails({...newBankDetails, ifscCode: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">UPI ID (Optional)</label>
+                          <input
+                            type="text"
+                            value={newBankDetails.upiId}
+                            onChange={(e) => setNewBankDetails({...newBankDetails, upiId: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium text-gray-700">Account Type</label>
+                          <select
+                            value={newBankDetails.accountType}
+                            onChange={(e) => setNewBankDetails({...newBankDetails, accountType: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          >
+                            <option value="savings">Savings Account</option>
+                            <option value="current">Current Account</option>
+                            <option value="nri">NRI Account</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-medium text-gray-700">Branch Address (Optional)</label>
+                        <input
+                          type="text"
+                          value={newBankDetails.branchAddress}
+                          onChange={(e) => setNewBankDetails({...newBankDetails, branchAddress: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="Bank branch address"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center p-4 bg-blue-50 rounded-xl border border-blue-200">
+                        <input
+                          type="checkbox"
+                          id="bankIsDefault"
+                          checked={newBankDetails.isDefault}
+                          onChange={(e) => setNewBankDetails({...newBankDetails, isDefault: e.target.checked})}
+                          className="w-5 h-5 text-primary bg-white border-gray-300 rounded focus:ring-primary focus:ring-2"
+                        />
+                        <label htmlFor="bankIsDefault" className="ml-3 text-sm font-medium text-blue-800">
+                          Set as default bank details for refunds
+                        </label>
+                      </div>
+                      
+                      <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <button
+                          type="submit"
+                          className="flex-1 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
+                        >
+                          {editingBankIndex !== null ? 'Update Bank Details' : 'Add Bank Details'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowBankForm(false);
+                            setEditingBankIndex(null);
+                            setNewBankDetails({
+                              accountHolderName: '',
+                              bankName: '',
+                              accountNumber: '',
+                              ifscCode: '',
+                              upiId: '',
+                              branchAddress: '',
+                              accountType: 'savings',
+                              isDefault: false
+                            });
+                          }}
+                          className="flex-1 px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {customer.bankDetails && customer.bankDetails.length > 0 ? (
+                  <div className="space-y-6">
+                    {customer.bankDetails.map((bankDetail, index) => (
+                      <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center">
+                                <i className="ri-bank-line text-primary text-xl"></i>
+                              </div>
+                              <div>
+                                <p className="text-lg font-semibold text-gray-900">{bankDetail.accountHolderName}</p>
+                                {bankDetail.isDefault && (
+                                  <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-primary text-white rounded-full">
+                                    <i className="ri-check-line mr-1"></i>
+                                    Default Bank Details
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="space-y-2 text-gray-700">
+                              <p className="flex items-center">
+                                <i className="ri-bank-line mr-2 text-gray-400"></i>
+                                <span className="font-medium">Bank:</span> {bankDetail.bankName}
+                              </p>
+                              <p className="flex items-center">
+                                <i className="ri-credit-card-line mr-2 text-gray-400"></i>
+                                <span className="font-medium">Account:</span> {bankDetail.accountNumber}
+                              </p>
+                              <p className="flex items-center">
+                                <i className="ri-code-s-slash-line mr-2 text-gray-400"></i>
+                                <span className="font-medium">IFSC:</span> {bankDetail.ifscCode}
+                              </p>
+                              {bankDetail.upiId && (
+                                <p className="flex items-center">
+                                  <i className="ri-phone-line mr-2 text-gray-400"></i>
+                                  <span className="font-medium">UPI ID:</span> {bankDetail.upiId}
+                                </p>
+                              )}
+                              {bankDetail.branchAddress && (
+                                <p className="flex items-center">
+                                  <i className="ri-map-pin-line mr-2 text-gray-400"></i>
+                                  <span className="font-medium">Branch:</span> {bankDetail.branchAddress}
+                                </p>
+                              )}
+                              <p className="flex items-center">
+                                <i className="ri-wallet-line mr-2 text-gray-400"></i>
+                                <span className="font-medium">Type:</span> {bankDetail.accountType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <button
+                              onClick={() => handleEditBankDetail(index)}
+                              className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                            >
+                              <i className="ri-edit-line mr-1"></i>
+                              Edit
+                            </button>
+                            {!bankDetail.isDefault && (
+                              <button
+                                onClick={() => handleSetDefaultBankDetail(index)}
+                                className="px-4 py-2 text-sm font-medium bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                              >
+                                <i className="ri-star-line mr-1"></i>
+                                Set Default
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteBankDetail(index)}
+                              className="px-4 py-2 text-sm font-medium bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                            >
+                              <i className="ri-delete-bin-line mr-1"></i>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <i className="ri-bank-line text-2xl text-gray-400"></i>
+                    </div>
+                    <p className="text-gray-600 text-lg">No bank details saved yet.</p>
+                    <p className="text-gray-500 text-sm mt-2">Add your bank details for faster refund processing.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

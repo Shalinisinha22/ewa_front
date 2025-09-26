@@ -23,6 +23,8 @@ const API = {
         customerOrders: `${BASE_API_URL}/auth/orders`,
         customerOrderCreate: `${BASE_API_URL}/auth/orders`,
         customerOrderDetails: `${BASE_API_URL}/auth/orders`,
+        customerOrderCancel: `${BASE_API_URL}/auth/orders`,
+        customerOrderReturn: `${BASE_API_URL}/auth/orders`,
         auth: `${BASE_API_URL}/auth`,
         customerAuth: `${BASE_API_URL}/auth`,
         banners: `${BASE_API_URL}/banners`,
